@@ -36,7 +36,7 @@ function startWatchingForShaking() {
 	var options = { frequency : 100 };
 	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
 	
-	alert("accelerometer loaded: "+watchId);
+	//alert("accelerometer loaded: "+watchId);
 }
 
 function accelerometerFired(coords) {
