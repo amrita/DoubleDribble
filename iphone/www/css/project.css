@@ -35,7 +35,7 @@
    background-color: green;
    width:   0px;
 	 
-	 visibility: hidden;
+   /*visibility: hidden;*/
 }
 
 .dHint
@@ -112,7 +112,7 @@
 	line-height: 30px;
 }
 
-.duck
+.ballClass
 {
 	background-image: url('../images/ball.png');
 	width: 40px;
@@ -126,4 +126,23 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
+}
+
+#numerator 
+{
+	top: -13px;
+}
+
+#denominator
+{
+	top: 8px;
+}
+
+.fraction-text 
+{
+	position: absolute;
+	width: 40px;
+	text-align: center;
+	
+	font-size: 12pt;
 }

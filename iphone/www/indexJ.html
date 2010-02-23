@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Double Dribble!</title>
+
+	<!-- Required jQTouch files -->
+    <script src="jqtouch/jquery.1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+
+    <link rel="stylesheet" type="text/css" href="jqtouch/jqtouch.css" />
+    <link rel="stylesheet" type="text/css" href="themes/apple/theme.css" />
+
+	<!-- Project-specific files -->
+    <script src="js/doubledribble.js" type="application/x-javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="css/doubledribble.css" />
+
+
+</head>
+<body>
+
+	<!-- Home screen -->
+	<div id="home">
+		<div class="toolbar">
+			<h1>Double Dribble</h1>
+		</div>
+		<ul class="rounded">
+			<li class="arrow"><a href="#problem-testing-screen">Test the Problem Generator</a></li>
+			<li class="arrow"><a href="#game-screen">Play the Game!</a></li>
+			<li class="arrow"><a href="#preferences-screen">Preferences</a></li>
+		</ul>
+	</div>
+
+	<!-- Problem testing screen -->
+	<div id="problem-testing-screen">
+		<div id="answer-area">
+			<div id="current-problem-text" class="floatleft">Current problem: </div>
+			<div id="current-problem" class="floatleft">1/2</div>
+		</div>
+		<div id="response-area">
+			<div id="bullseye" class="response-box" onclick="bullseyeAnswer();">Bullseye</div>
+			<div id="close-enough" class="response-box" onclick="closeEnoughAnswer();">Close Enough</div>
+			<div id="wrong" class="response-box" onclick="wrongAnswer();">Wrong</div>
+		</div>
+		<div id="player-score-area">
+			<div id="player-score-text" class="floatleft">Score: </div>
+			<div id="player-score" class="floatleft">0</div>
+		</div>		
+		<div id="level">
+			<div id="current-level-text" class="floatleft">Level: </div>
+			<div id="current-level" class="floatleft">1</div>
+		</div>
+	</div>
+
+
+	<!-- Game screen -->
+	<div id="game-screen">
+		<div id="full-screen-area">
+			<div id="ball-area">
+				<div id="score-area">*120*</div>
+				<div class="bball" id="ball-1">
+					<div class="ball-fraction" class="ball-fraction-top" id="ball-1-num-1">1</div>
+					<div class="ball-fraction" class="ball-fraction-top" id="ball-1-num-2">2</div>
+				</div>
+				<div class="bball" id="ball-2"></div>
+				<div class="bball" id="ball-3"></div>
+				
+				</div>
+			</div>
+			<div id="baseboard-area">
+				<div id="left-baseboard-num" class="baseboard-num">0</div>
+				<div id="baseboard-buffer"  class="baseboard-num">&nbsp;</div>
+				<div id="right-baseboard-num" class="baseboard-num">1</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Preferences screen -->
+	<div id="preferences-screen">
+		<div class="toolbar">
+			<h1>Preferences</h1>
+			<a class="button back" href="#">Back</a>
+		</div>
+		<ul class="rounded" class="form">
+			<li class="form">Richard 3000</li>
+			<li>Kahlan 2000</li>
+			<li><form id="myform" name="myform" method="post" action="#">
+					<label><input type="radio" name="myradios" value="1" />alpha</label>
+					<label><input type="radio" name="myradios" value="2" />beta</label>
+					<label><input type="radio" name="myradios" value="3" />gamma</label>
+				</form>
+			</li>
+		</ul>
+	</div>
+
+
+</body>
+</html>
