@@ -23,26 +23,16 @@ var answerY;
 //top of the baseboard
 var topBaseboard;
 
-//current try 
-var currentTry = 1;
-
-//max tries
-var maxTries = 4;
-
-//problem counter
-var numProblemsThisLevel;
-
-//decimal Equivalent of the answer 
+/*decimal Equivalent of the answer 
 var decimalEquivalent = [0.25,0.40,0.50,1.00,0.30,0.66,0.80,0.35,0.70,0.33];
 var numerators=         [   1,   2,   1,   1,   3,   2,   4,   7,   7,   1];
 var denominators=       [   4,   5,   2,   1,  10,   3,   5,  20,  10,   3];
 var id     = 0; 
-var error  = 10; // error allowed in pixels. 
 var randomId; 
+*/
 
-//Baseboard min and max values
-var baseBoardMin = 0;
-var baseBoardMax = 1;
+var error			 = 15; // error allowed in pixels. 
+var closeEnoughError = 30;
 
 //accelerometer variables to make the object bounce
 var yVal = 0.0;
@@ -72,19 +62,32 @@ function pageIsLoaded()
 
 function gameScreenHasAppeared()
 {
-
+	
+	//alert("gameScreenHasAppeared");
 	//get the x value for the top of the baseboard
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
-
+	
+	//alert("gameScreenHasAppeared1");
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
-
+	
+	//alert("gameScreenHasAppeared1a");
 	//set level parameters
 	setLevelParameters();
-
+	
+	//alert("gameScreenHasAppeared1b");
+	// Initialize problem arrays
+	createFractionProblem2DArray();
+	//alert("gameScreenHasAppeared1c"); 
+	createMultiplicationProblem2DArray();
+	//alert("gameScreenHasAppeared1d");
+	currentProblem = fractionProblems[2][1];
+	
+	//alert("gameScreenHasAppeared2");
 	// Add ball to screen
 	addBall();
 	
+	//alert("gameScreenHasAppeared3");
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
@@ -131,6 +134,7 @@ function animationLoop()
 	var width;
 	var left;
 	
+	//alert("animationloop");
 	// Move the ball position down 1 pixel	
 	var top = parseInt(ball.css("top"));
 	var newTop = top + velocity;
@@ -148,13 +152,13 @@ function animationLoop()
 	// Move left/right
 	var left = parseInt(ball.css("left"));
 	var newLeft = left + yVal;
-	if (newLeft < 0) {
+	if (newLeft < -20) {
 		// BOUNCE
-		newLeft *= -1;
+		newLeft += (newLeft + 20);
 		yVal *= -1;
-	} else if (newLeft > 270) {
+	} else if (newLeft > 300) {
 		// BOUNCE
-		newLeft -= (newLeft - 270); // subtract the amount over 310 from 310
+		newLeft -= (newLeft - 300); // subtract the amount over 310 from 310
 		yVal *= -1;
 	}
 	$(ball).css("left", newLeft);
@@ -162,6 +166,7 @@ function animationLoop()
 	//set the current x,y co-ordinates of the object
 	setObjectXY(ball);
 
+	
 	//if the object has hit the baseboard check the answer
 	if (ballX >= topBaseboard){
 		checkAnswer(ballX,ballY,answerY,ball);
@@ -177,23 +182,18 @@ function checkAnswer(X,Y,answer,ball){
 	
 	//if the answer is correct then light up baseboard 
 	if ((Y >= (answer - error)) && (Y <= (answer + error))){
-		
-		//display the correct answer
-		displayAnswerBoard(answer);
-	
+			
 		//set timeout
 		//setTimeout("",2000);
 		
-		//save the denominator 
-		var olddenom = denominators[randomId];
+		//save the denominator
+		var olddenom = currentProblem.denominator;
 		
-		// get another problem
-		// get a random problem from the problems array
-		randomId = Math.floor(Math.random() * 10);
-		computeBaseboardAnswer(decimalEquivalent[randomId],baseBoardMin,baseBoardMax);
+		bullseyeAnswer(answer);
+		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		//set the new problem
 		//ball.text(decimalEquivalent[randomId]);
-		setNewProblem(randomId);
+		//setNewProblem(randomId);
 		
 		//re-initialize the ball position
 		//initializePositionForBall(ball);
@@ -208,10 +208,11 @@ function checkAnswer(X,Y,answer,ball){
 		currentTry = 1;
 		
 		
-	}
-	else{
+	} else {
 		//increment the number of tries 
 		currentTry++;
+		streakCounter = 0;
+		adjustProblemProbabilities('wrong');
 		//alert("current try is " + currentTry);
 		
 		//the current try is 
@@ -219,18 +220,16 @@ function checkAnswer(X,Y,answer,ball){
 		  case 2:
 				//show hint 
 				showArrowHint(X,Y,answer);
-				//reset the position of the ball
-				//initializePositionForBall(ball);
+				playWrongAnswerSound();
                 break;
-			case 3:
+		  case 3:
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
 				showDenominatorHint(X,Y,answer);
-				//reset the position of the ball
-				//initializePositionForBall(ball);
+				playWrongAnswerSound();
                 break;
-			case 4:	
+		  case 4:	
 			  currentTry = 1;
 				clearInterval(timerLoop);	
 				clearArrowHint();
@@ -243,10 +242,13 @@ function checkAnswer(X,Y,answer,ball){
 	
 }
 
+/*
 function setNewProblem(randomId) {
+	
 	$("#numerator").text(numerators[randomId]);
 	$("#denominator").text(denominators[randomId]);
 }
+ */
 
 
 //set the current x,y co-ordinates of the ball 
@@ -281,13 +283,12 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelParameters(){
-	$("#baseMin").text(baseBoardMin);
-	$("#baseMax").text(baseBoardMax);
+	$("#baseMin").text(baseboardMin);
+	$("#baseMax").text(baseboardMax);
 }
 
-
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
-function computebBoardLocation(problemId,bMin,bMax){
+function computeBoardLocation(problemId,bMin,bMax){
   var phoneWidth = 320;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
@@ -298,13 +299,10 @@ function computebBoardLocation(problemId,bMin,bMax){
 
 function addBall()
 {
-
-	// get a random problem from the problems array
-    randomId = Math.floor(Math.random() * 10);
 	
-	computeBaseboardAnswer(decimalEquivalent[randomId],baseBoardMin,baseBoardMax);
+	computeBaseboardAnswer(currentProblem.decimalEquivalent,baseboardMin,baseboardMax);
 	
-	setNewProblem(randomId);
+	displayCurrentProblem();
 	
 	//$("#ball").text(decimalEquivalent[randomId]);
 	
@@ -378,7 +376,7 @@ function showDenominatorHint(X,Y,answer){
 	var decimalvalue;
 	var answer;
 	
-	denom = denominators[randomId];
+	denom = currentProblem.denominator;
 	
 	//alert("in show denom hint denom is " + denom );
 	
@@ -389,7 +387,7 @@ function showDenominatorHint(X,Y,answer){
 	  decimalvalue	= i / denom; 
 		
 		//compute the pixel where it should be on the baseboard 
-		answer        = computebBoardLocation(decimalvalue,baseBoardMin, baseBoardMax);
+		answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
 		
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
@@ -476,25 +474,9 @@ function problemObject()
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
 }
 
-
-function pageIsLoaded()
+/*
+function initialize()
 {
-	$("#problem-testing-screen").bind("pageAnimationEnd", problemTestScreenHasAppeared);
-	$("#game-screen").bind("pageAnimationEnd", gameScreenHasAppeared);
-}
-
-function gameScreenHasAppeared()
-{
-	
-}
-
-function problemTestScreenHasAppeared()
-{
-	if ($('#edit-checkbox-id').is(':checked'))
-	{
-		alert('1');
-	}
-	
 	createFractionProblem2DArray(); 
 	createMultiplicationProblem2DArray();
 	initializeProbabilities();
@@ -502,9 +484,10 @@ function problemTestScreenHasAppeared()
 	
 	displayFirstProblem();
 }
-
+*/
 
 // Shows the first problem "1", and then once the 1 is solved correctly, pulls the next problem
+// TODO: implement
 function displayFirstProblem()
 {
 	
@@ -517,13 +500,14 @@ function displayFirstProblem()
 //
 
 // Calls the appropriate bulleye sound and graphic, adjusts the score, and pulls the next problem
-function bullseyeAnswer()
+function bullseyeAnswer(answer)
 {
-	displayBullseyeGraphic();
+	//lights up the baseboard to the correct value
+	displayAnswerBoard(answer);
+	
 	playBullseyeSound();
 	adjustScore('bullseye');
 	adjustProblemProbabilities('bullseye');
-	alert('hi');
 	nextProblem();
 }
 
@@ -593,30 +577,7 @@ function adjustScore(accuracy)
 function increaseScore(increase)
 {
 	playerScore = playerScore + increase;
-	$("#player-score").text(playerScore);
-}
-
-// Depending on current try, shows appropriate hint, and plays a sound for guessing wrong. 
-function wrongAnswer()
-{
-	streakCounter = 0;
-	adjustProblemProbabilities('wrong');
-	
-	if(currentTry == 1){
-		playWrongAnswerSound();
-	}
-	else if (currentTry == 2){ 
-		playWrongAnswerSound();
-		displayFirstHint();
-	}
-	else if (currentTry == 3){ 
-		playWrongAnswerSound();
-		displaySecondHint();
-	}
-	else if(currentTry >= 4){ 
-		gameOver(); 
-	}
-	currentTry++;
+	$("#score").text(playerScore);
 }
 
 function playWrongAnswerSound()
@@ -629,27 +590,12 @@ function bonusGraphic()
 	
 }
 
-function displayFirstHint()
-{
-	alert('first hint');
-}
-
-function displaySecondHint()
-{
-	alert('second hint');	
-}
-
-function gameOver()
-{
-	alert('game over!');	
-}
-
 // Controls the sequences of levels
 function nextLevel()
 {
 	currentLevel++;
-	alert('level' + currentLevel);
-	$("#current-level").text(currentLevel);
+	//alert('level' + currentLevel);
+	$("#level").text(currentLevel);
 	
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
@@ -686,9 +632,9 @@ function createFractionProblem2DArray()
 			fractionProblems[denom][numer].decimalEquivalent = (numer / denom);
 			
 			if(numer == 0){   
-				fractionProblems[denom][numer].probability = .2;  // sets lower probabilities for 0 in the numerator
+				fractionProblems[denom][numer].probability = .0;  // sets lower probabilities for 0 in the numerator
 			} else if (numer == denom){  
-				fractionProblems[denom][numer].probability = .4;  // sets lower probabilities for all fractions = 1
+				fractionProblems[denom][numer].probability = .0;  // sets lower probabilities for all fractions = 1
 			} else if (numer == 1){
 				fractionProblems[denom][numer].probability = .1;  // sets high probability for when numer = 1
 			} else {
@@ -813,8 +759,10 @@ function displayCurrentProblem()
 {
 	switch(currentProblem.problemType){
 		case 'fraction':
-			var fractionString = currentProblem.numerator + "/" + currentProblem.denominator;
-			$("#current-problem").text(fractionString);
+			//var fractionString = currentProblem.numerator + "/" + currentProblem.denominator;
+			//$("#current-problem").text(fractionString);
+			$("#numerator").text(currentProblem.numerator);
+			$("#denominator").text(currentProblem.denominator);
 			break;
 		case 'multiplication':
 			var fractionString = currentProblem.numerator + "x" + currentProblem.denominator;

@@ -63,8 +63,21 @@
     position: absolute;
     height: 20px;
     border: 1px solid green;
-    text-align: center;
+    text-align: left;
     line-height: 20px;
+	width: 80px;
+	left: 240px;
+}
+
+#score-div {
+	top: 20px;
+}
+
+#level-div {
+}
+
+.game-value {
+	float: right;
 }
 
 /* to change arrow, change the image being pointed to in the url and change the 
