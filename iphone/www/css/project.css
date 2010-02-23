@@ -4,6 +4,12 @@
 	margin: 0px;
 }
 
+.all-text{
+  font-family: Helvetica;
+	font-size: 24pt;
+	text-align: center;
+}
+
 #full-screen-area
 {
 	background-color: white;
@@ -11,27 +17,106 @@
 	height: 460px;
 }
 
-#axis-left {
+.baseboardclass{
+  height: 30px;
 	
+	margin-top: 400px;
+	position: absolute;
+}
+
+#baseboard
+{
+   background-color: yellow;
+   width: 320px;
+}
+
+#answerboard
+{
+   background-color: green;
+   width:   0px;
+	 
+	 visibility: hidden;
+}
+
+.dHint
+{
+  height: 30px;
+	width:  1px;
+	
+	margin-top: 400px;
+	margin-left:  0px;
+	position: absolute;
+	
+	background-color: black;
+}
+
+
+#axis-left {
+    
 }
 
 #axis-right {
-	left: 200px;
+    left: 200px;
 }
 
 .axis-button {
+    position: absolute;
+    height: 20px;
+    border: 1px solid green;
+    text-align: center;
+    line-height: 20px;
+}
+
+/* to change arrow, change the image being pointed to in the url and change the 
+   width and the height pixel values */ 
+
+#blackarrowleft
+{
+	background-image: url('../images/blackarrowleft.png');
+	width: 35px;
+	height: 26px;
+
+	margin-top: 430px;
+	margin-left: 0px;
 	position: absolute;
-	height: 20px;
-	border: 1px solid green;
-	text-align: center;
-	line-height: 20px;
+	
+	visibility: hidden;
+}
+
+#blackarrowright
+{
+	background-image: url('../images/blackarrowright.png');
+	width: 35px;
+	height: 26px;
+
+	margin-top: 430px;
+	margin-left: 0px;
+	position: absolute;
+	
+	visibility: hidden;
+}
+
+#baseMin
+{
+	margin-top: 430px;
+	margin-left: 0px;
+	position: absolute;
+	line-height: 30px;
+}
+
+#baseMax
+{
+	margin-top: 430px;
+	margin-left: 308px;
+	position: absolute;
+	line-height: 30px;
 }
 
 .duck
 {
-	background-image: url('../images/duck.png');
-	width: 50px;
-	height: 48px;
+	background-image: url('../images/ball.png');
+	width: 40px;
+	height: 40px;
 	
 	font-family: Helvetica;
 	font-size: 28pt;
