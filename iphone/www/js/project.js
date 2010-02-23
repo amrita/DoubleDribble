@@ -23,14 +23,6 @@ var answerY;
 //top of the baseboard
 var topBaseboard;
 
-/*decimal Equivalent of the answer 
-var decimalEquivalent = [0.25,0.40,0.50,1.00,0.30,0.66,0.80,0.35,0.70,0.33];
-var numerators=         [   1,   2,   1,   1,   3,   2,   4,   7,   7,   1];
-var denominators=       [   4,   5,   2,   1,  10,   3,   5,  20,  10,   3];
-var id     = 0; 
-var randomId; 
-*/
-
 var error			 = 15; // error allowed in pixels. 
 var closeEnoughError = 30;
 
@@ -63,31 +55,23 @@ function pageIsLoaded()
 function gameScreenHasAppeared()
 {
 	
-	//alert("gameScreenHasAppeared");
 	//get the x value for the top of the baseboard
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
 	
-	//alert("gameScreenHasAppeared1");
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
 	
-	//alert("gameScreenHasAppeared1a");
 	//set level parameters
 	setLevelParameters();
 	
-	//alert("gameScreenHasAppeared1b");
 	// Initialize problem arrays
 	createFractionProblem2DArray();
-	//alert("gameScreenHasAppeared1c"); 
 	createMultiplicationProblem2DArray();
-	//alert("gameScreenHasAppeared1d");
 	currentProblem = fractionProblems[2][1];
 	
-	//alert("gameScreenHasAppeared2");
 	// Add ball to screen
 	addBall();
 	
-	//alert("gameScreenHasAppeared3");
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
@@ -134,16 +118,11 @@ function animationLoop()
 	var width;
 	var left;
 	
-	//alert("animationloop");
 	// Move the ball position down 1 pixel	
 	var top = parseInt(ball.css("top"));
 	var newTop = top + velocity;
 	if (newTop > 360) {
-		//alert("top: "+top+" vel: "+velocity);
-		//newTop = 0;
 		newTop = 360;
-		//velocity = 0.0;
-		//velocity *= -1.0; - Gradually made ball jump higher and higher
 		velocity = BOUNCE_VELOCITY;
 		yVal = 0.0;
 	}
@@ -182,21 +161,12 @@ function checkAnswer(X,Y,answer,ball){
 	
 	//if the answer is correct then light up baseboard 
 	if ((Y >= (answer - error)) && (Y <= (answer + error))){
-			
-		//set timeout
-		//setTimeout("",2000);
 		
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
 		bullseyeAnswer(answer);
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
-		//set the new problem
-		//ball.text(decimalEquivalent[randomId]);
-		//setNewProblem(randomId);
-		
-		//re-initialize the ball position
-		//initializePositionForBall(ball);
 		
 		//clear the display answer board;
 		clearAnswerBoard();
@@ -242,14 +212,6 @@ function checkAnswer(X,Y,answer,ball){
 	
 }
 
-/*
-function setNewProblem(randomId) {
-	
-	$("#numerator").text(numerators[randomId]);
-	$("#denominator").text(denominators[randomId]);
-}
- */
-
 
 //set the current x,y co-ordinates of the ball 
 function setObjectXY(obj){
@@ -278,8 +240,6 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	answerY    = problemId * (phoneWidth / (bMax - bMin));
-	
-	//alert("the answer is " + answerY);
 }
 
 function setLevelParameters(){
@@ -304,8 +264,6 @@ function addBall()
 	
 	displayCurrentProblem();
 	
-	//$("#ball").text(decimalEquivalent[randomId]);
-	
 	// Now, we need to grab a reference to the ball we just added to the HTML
 	ball = $("#ball");
 	
@@ -321,7 +279,6 @@ function initializePositionForBall(ball)
 	var screenWidth = parseInt($("#game-screen").css("width"));
 	
 	// Start the ball just above the top of the screen
-	//var newBallTop = -1 * ballHeight;
 	var newBallTop = 10;
 	
 	// Make sure the ball doesn't hang off the right side of the screen
@@ -378,8 +335,6 @@ function showDenominatorHint(X,Y,answer){
 	
 	denom = currentProblem.denominator;
 	
-	//alert("in show denom hint denom is " + denom );
-	
 	//compute points on the number line based on the denominator
 	for (i = 1; i <= denom; i++){
 		
@@ -415,20 +370,13 @@ function displayAnswerBoard(answerY){
 	$("#answerboard").css("width",newWidth);
 	
 	//make it visible 
-	//$("#answerboard").css("visibility","visible");
 	$("#answerboard").fadeIn('fast');
   
 }
 
 // clear the answer board
 function clearAnswerBoard(answerY){
-	
 	$("#answerboard").fadeOut('slow');
-	//$("#answerboard").css("width",0);
-	
-	//make it invisible 
-	//$("#answerboard").css("visibility","hidden");
-  
 }
 
 
@@ -530,7 +478,17 @@ function displayBullseyeGraphic()
 // Plays a random sound from the bullseyeSoundArray
 function playBullseyeSound()
 {
-	
+    var arrow = new Media("www/sounds/arrow.wav");
+    arrow.play();
+}
+
+function playWrongAnswerSound()
+{
+	alert("playSound");
+    var stringsound = new Media("www/sounds/pong.wav");
+	alert("playSound1");
+    stringsound.play();
+	alert("playSound2");
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
@@ -578,11 +536,6 @@ function increaseScore(increase)
 {
 	playerScore = playerScore + increase;
 	$("#score").text(playerScore);
-}
-
-function playWrongAnswerSound()
-{
-	
 }
 
 function bonusGraphic()
