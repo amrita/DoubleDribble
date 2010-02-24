@@ -49,6 +49,11 @@
  */
 - (void)applicationDidFinishLaunching:(UIApplication *)application
 {	
+	//
+	// ED176: disabling auto-sleep
+	//
+	application.idleTimerDisabled = YES;
+
 	/*
 	 * PhoneGap.plist
 	 *

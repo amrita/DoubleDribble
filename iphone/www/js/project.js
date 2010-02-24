@@ -131,9 +131,9 @@ function animationLoop()
 	// Move left/right
 	var left = parseInt(ball.css("left"));
 	var newLeft = left + yVal;
-	if (newLeft < -20) {
+	if (newLeft < 0) {
 		// BOUNCE
-		newLeft += (newLeft + 20);
+		newLeft *= -1;
 		yVal *= -1;
 	} else if (newLeft > 300) {
 		// BOUNCE
@@ -183,7 +183,6 @@ function checkAnswer(X,Y,answer,ball){
 		currentTry++;
 		streakCounter = 0;
 		adjustProblemProbabilities('wrong');
-		//alert("current try is " + currentTry);
 		
 		//the current try is 
 		switch(currentTry){
@@ -207,6 +206,7 @@ function checkAnswer(X,Y,answer,ball){
 				displayAnswerBoard(answerY);
 				gameOver();	
 				break;
+		  default:
 		}
   }
 	
