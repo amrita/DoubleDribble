@@ -484,11 +484,11 @@ function playBullseyeSound()
 
 function playWrongAnswerSound()
 {
-	alert("playSound");
+	//alert("playSound");
     var stringsound = new Media("www/sounds/pong.wav");
-	alert("playSound1");
+	//alert("playSound1");
     stringsound.play();
-	alert("playSound2");
+	//alert("playSound2");
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
