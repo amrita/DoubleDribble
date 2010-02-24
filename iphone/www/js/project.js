@@ -35,6 +35,9 @@ var velocity = 0.0;
 //not needed remove later 
 var yDELTA = 1.0;
 
+// whether or not the player is playing the first problem in the game
+var firstProblemInTheGame;
+
 // Initialization method
 $(function() {
   
@@ -75,6 +78,8 @@ function gameScreenHasAppeared()
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
+	// Set that we're starting the game
+	firstProblemInTheGame = true;
 }
 
 /******* ACCELEROMETER CODE *******/
@@ -177,12 +182,19 @@ function checkAnswer(X,Y,answer,ball){
 		//reset current try to 1
 		currentTry = 1;
 		
-		
+		if (firstProblemInTheGame) {
+			firstProblemInTheGame = false;
+		}
 	} else {
 		//increment the number of tries 
 		currentTry++;
 		streakCounter = 0;
 		adjustProblemProbabilities('wrong');
+		
+		// The first time the user has infinite tries
+		if (firstProblemInTheGame && currentTry > 3) {
+			currentTry = 3;
+		}
 		
 		//the current try is 
 		switch(currentTry){

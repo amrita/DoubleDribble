@@ -120,14 +120,14 @@
 #baseMax
 {
 	margin-top: 430px;
-	margin-left: 308px;
+	margin-left: 303px;
 	position: absolute;
 	line-height: 30px;
 }
 
 .ballClass
 {
-	background-image: url('../images/ball.png');
+	background-image: url('../images/ball2.png');
 	width: 40px;
 	height: 40px;
 	
