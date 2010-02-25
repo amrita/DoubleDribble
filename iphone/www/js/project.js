@@ -65,7 +65,7 @@ function gameScreenHasAppeared()
 	timerLoop = setInterval("animationLoop()", 50);
 	
 	//set level parameters
-	setLevelParameters();
+	setBaseboardLimits();
 	
 	// Initialize problem arrays
 	createFractionProblem2DArray();
@@ -170,7 +170,13 @@ function checkAnswer(X,Y,answer,ball){
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
-		bullseyeAnswer(answer);
+		if (Y == answer){
+		  bullseyeAnswer(answer);
+		}
+		else{
+			closeEnoughAnswer(answer);
+		}
+		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
 		//clear the display answer board;
@@ -248,20 +254,20 @@ function setObjectXY(obj){
 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
 function computeBaseboardAnswer(problemId,bMin,bMax){
-  var phoneWidth = 320;
+  var phoneWidth = 300;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	answerY    = problemId * (phoneWidth / (bMax - bMin));
 }
 
-function setLevelParameters(){
+function setBaseboardLimits(){
 	$("#baseMin").text(baseboardMin);
 	$("#baseMax").text(baseboardMax);
 }
 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
 function computeBoardLocation(problemId,bMin,bMax){
-  var phoneWidth = 320;
+  var phoneWidth = 300;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	var answer    = problemId * (phoneWidth / (bMax - bMin));
@@ -567,11 +573,13 @@ function nextLevel()
 	
 	if(currentLevel == 5){
 		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
+		setBaseboardLimits();
 	}   	
 	
 	if(currentLevel == 9){ 
 		currentLevelType = 'multiplication';
 		baseboardMax = highestMultiplier * highestMultiplier;
+		setBaseboardLimits();
 	}
 }
 

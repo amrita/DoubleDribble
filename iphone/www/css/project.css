@@ -21,13 +21,14 @@
   height: 30px;
 	
 	margin-top: 400px;
+	margin-left: 10px;
 	position: absolute;
 }
 
 #baseboard
 {
    background-color: yellow;
-   width: 320px;
+   width: 300px;
 }
 
 #answerboard
