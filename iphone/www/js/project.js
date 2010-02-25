@@ -257,7 +257,8 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
   var phoneWidth = 300;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
-	answerY    = problemId * (phoneWidth / (bMax - bMin));
+	//everything is now offset by 10 pixels
+	answerY    = problemId * (phoneWidth / (bMax - bMin)) + 10;
 }
 
 function setBaseboardLimits(){
@@ -270,7 +271,8 @@ function computeBoardLocation(problemId,bMin,bMax){
   var phoneWidth = 300;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
-	var answer    = problemId * (phoneWidth / (bMax - bMin));
+	// everything is now offset by 10 pixels; 
+	var answer    = problemId * (phoneWidth / (bMax - bMin)) + 10;
 	
 	return answer;
 }
