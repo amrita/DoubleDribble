@@ -597,9 +597,9 @@ function createFractionProblem2DArray()
 			fractionProblems[denom][numer].decimalEquivalent = (numer / denom);
 			
 			if(numer == 0){   
-				fractionProblems[denom][numer].probability = .0;  // sets lower probabilities for 0 in the numerator
+				fractionProblems[denom][numer].probability = .3;  // sets lower probabilities for 0 in the numerator
 			} else if (numer == denom){  
-				fractionProblems[denom][numer].probability = .0;  // sets lower probabilities for all fractions = 1
+				fractionProblems[denom][numer].probability = .3;  // sets lower probabilities for all fractions = 1
 			} else if (numer == 1){
 				fractionProblems[denom][numer].probability = .1;  // sets high probability for when numer = 1
 			} else {
