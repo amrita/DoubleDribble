@@ -28,8 +28,8 @@ var closeEnoughError = 30;
 
 //accelerometer variables to make the object bounce
 var yVal = 0.0;
-var GRAV = 8.1;
-var gravity = GRAV * 50.0 / 1000.0;
+var GRAVITY = 0.15;
+var gravity = GRAVITY * 50.0 / 1000.0;
 var BOUNCE_VELOCITY = -13.5;
 var velocity = 0.0;
 //not needed remove later 
@@ -80,10 +80,18 @@ function gameScreenHasAppeared()
 	
 	// Set that we're starting the game
 	firstProblemInTheGame = true;
+	
+	changeGravity(GRAVITY);
+	_oldTime = new Date().getTime();
 }
 
 /******* ACCELEROMETER CODE *******/
 function startWatchingForShaking() {
+	//if (typeof(PhoneGap) != 'undefined') {
+	//	alert("accel: "+ navigator.accelerometer.watchAcceleration);
+	//	return;
+	//}
+	
 	var win = function(coords){
 		accelerometerFired(coords); 		
 	};
@@ -95,6 +103,7 @@ function startWatchingForShaking() {
 }
 
 function accelerometerFired(coords) {
+	//alert(coords);
 	if ((yVal > 0.0 && coords.x < 0.0) || (yVal < 0.0 && coords.x > 0.0)) {
 		yVal = coords.x;
 	}
@@ -123,26 +132,25 @@ function animationLoop()
 	var width;
 	var left;
 	
-	// Move the ball position down 1 pixel	
-	var top = parseInt(ball.css("top"));
-	var newTop = top + velocity;
-	if (newTop > 360) {
-		newTop = 360;
-		velocity = BOUNCE_VELOCITY;
-		yVal = 0.0;
+	// Move the ball up/down	
+	var newTop = getTopForTime();
+	if (newTop > _yInitial) {
+		newTop = _yInitial;
+		_oldTime = _newTime;
 	}
-	$(ball).css("top", parseInt(newTop));
+	//alert("top: "+newTop);
+	$(ball).css("top", newTop);
 	
-	// Move left/right
+	// Move the ball left/right
 	var left = parseInt(ball.css("left"));
 	var newLeft = left + yVal;
 	if (newLeft < 0) {
 		// BOUNCE
 		newLeft *= -1;
 		yVal *= -1;
-	} else if (newLeft > 300) {
+	} else if (newLeft > 280) {
 		// BOUNCE
-		newLeft -= (newLeft - 300); // subtract the amount over 310 from 310
+		newLeft -= (newLeft - 280); // subtract the amount over 310 from 310
 		yVal *= -1;
 	}
 	$(ball).css("left", newLeft);
@@ -170,8 +178,9 @@ function checkAnswer(X,Y,answer,ball){
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
+		displayAnswerBoard(answerY);
 		if (Y == answer){
-		  bullseyeAnswer(answer);
+		    bullseyeAnswer(answer);
 		}
 		else{
 			closeEnoughAnswer(answer);
@@ -226,8 +235,7 @@ function checkAnswer(X,Y,answer,ball){
 				break;
 		  default:
 		}
-  }
-	
+	}
 }
 
 
@@ -404,6 +412,55 @@ function gameOver(){
   alert("Game Over !!");
 }
 
+/********* GRAVITY CODE **********/
+
+/**
+ * Improved gravity
+ *                     1   2
+ *           y = v  +  - gt
+ *                ˚    2
+ */
+var _gravity;
+var _velocity;
+var _ballBounceHeight = 330.0;
+var _yInitial = 360.0; // TODO: tie this to location of baseboard
+var _roundtripTime = 2500;
+function changeGravity(newGravity) {
+	_gravity = newGravity / 1000.0;
+	//var tobesqrt = 2.0 *  _ballBounceHeight / _gravity;
+	var time = Math.sqrt( 2.0 *  _ballBounceHeight / _gravity ); 
+	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
+	//var ht = _ballBounceHeight / time;
+	//var gt = _gravity * time / 2.0;
+	//alert("initVel: "+_initialVelocity+" height: "+_ballBounceHeight+" time: "+time+" grav: "+_gravity+" sqrt: "+tobesqrt+" ht: "+ht+" gt: "+gt);
+}
+
+/**
+ * Get the trajectory from the given time.
+ *                       1   2              1  
+ *       y = y  + v t +  - gt  = y  + t(v + - gt )
+ *            ˚    ˚     2        ˚         2
+ * returns an int
+ */
+var _newTime;
+var _oldTime;
+var starttest = true;
+function getTopForTime() {
+	_newTime = new Date().getTime();
+	
+	var newTop;
+	if (_newTime == _oldTime) {
+		newTop = _xInitial;
+	} else {
+		var timeDelta = _newTime - _oldTime;
+		newTop = _yInitial + timeDelta * ( _initialVelocity + _gravity * timeDelta / 2.0 );
+		//var vel = timeDelta * _initialVelocity;
+		//var acc = _gravity * timeDelta * timeDelta / 2.0;
+		//alert("nt: "+newTop+" timeDelta: "+timeDelta+" initVel: "+_initialVelocity+" grav: "+_gravity+" vel: "+vel+" acc: "+acc);
+	}
+	
+	return parseInt( newTop );
+}
 
 /********* LEVEL CODE **********/
 
@@ -504,11 +561,8 @@ function playBullseyeSound()
 
 function playWrongAnswerSound()
 {
-	//alert("playSound");
     var stringsound = new Media("www/sounds/pong.wav");
-	//alert("playSound1");
     stringsound.play();
-	//alert("playSound2");
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
