@@ -62,6 +62,8 @@ function pageIsLoaded()
 	
 	$("#settings form").submit(saveSettings);
 	$("#settings").bind("pageAnimationStart", loadSettings);
+	
+	loadSounds();
 }
 
 function gameScreenHasAppeared()
@@ -99,13 +101,25 @@ function loadSettings() {
 	if (localStorage.gravity == null) {
 		localStorage.gravity = INIT_GRAVITY;
 	}
+	if (localStorage.sound == null) {
+		localStorage.sound = isSoundOn;
+	} else {
+		isSoundOn = localStorage.sound;
+	}
     $("#gravity").val(localStorage.gravity);
+    $("#sound").val(localStorage.sound);
 }
 
 function saveSettings() {
 	//alert("Saving grav: "+ $("#gravity").val());
+	// Gravity
 	INIT_GRAVITY = parseFloat($("#gravity").val());
     localStorage.gravity = INIT_GRAVITY;
+	
+	// Sound
+	isSoundOn = $("#sound").is(":checked");
+	//alert("sound: "+isSoundOn);
+	
     jQT.goBack();
     return false;
 }
@@ -566,17 +580,30 @@ function displayBullseyeGraphic()
 	
 }
 
-// Plays a random sound from the bullseyeSoundArray
-function playBullseyeSound()
-{
-    var arrow = new Media("www/sounds/arrow.wav");
-    arrow.play();
+/********* SOUND CODE **********/
+
+function loadSounds() {
+	arrow = new Media("www/sounds/arrow.wav");
+	stringsound = new Media("www/sounds/pong.wav");
 }
 
+// Plays a random sound from the bullseyeSoundArray
+var arrow;
+function playBullseyeSound()
+{
+    playSoundIfSoundIsOn(arrow);
+}
+
+var stringsound;
 function playWrongAnswerSound()
 {
-    var stringsound = new Media("www/sounds/pong.wav");
-    stringsound.play();
+    playSoundIfSoundIsOn(stringsound);
+}
+
+function playSoundIfSoundIsOn(media) {
+	if (isSoundOn) {
+		media.play();
+	}
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
