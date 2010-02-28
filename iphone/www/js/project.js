@@ -721,9 +721,18 @@ function changeLevelType(levelType)
 {
 	currentLevelType = levelType;
 	
-	switch
-
 	
+	//changes the background of the ball
+	switch(levelType){
+		case 'multiplication':
+			var newBg = "url('../images/plainball.png')";
+			$(".ballClass").css("background-image", newBg);
+			break;
+		case 'sqroot':
+			var newBg = "url('../images/sqrootball.png')";
+			$(".ballClass").css("background-image", newBg);
+			break;
+	}
 }
 
 
