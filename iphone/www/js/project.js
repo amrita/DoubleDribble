@@ -83,6 +83,9 @@ function gameScreenHasAppeared()
 	createMultiplicationProblem2DArray();
 	currentProblem = fractionProblems[2][1];
 	
+	// Initialize Game sounds
+	initializeGameSounds();
+	
 	// Add ball to screen
 	addBall();
 	
@@ -233,14 +236,14 @@ function checkAnswer(X,Y,answer,ball){
 		  case 2:
 				//show hint 
 				showArrowHint(X,Y,answer);
-				playWrongAnswerSound();
+				playWrongAnswerSound(Y - answer);
                 break;
 		  case 3:
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
 				showDenominatorHint(X,Y,answer);
-				playWrongAnswerSound();
+				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:	
 			  currentTry = 1;
@@ -525,6 +528,12 @@ var currentProblem;  // Tracks the current problem the player is working on
 var multiplicationProblems = new Array(); // Creating an Array to hold all the multiplication problems
 var highestMultiplier = 10; // The highest number for multiplication problems
 
+var wrongAnswerSounds = new Array();
+var closeEnoughSounds = new Array();
+var bullseyeSounds = new Array();
+var nextLevelSounds = new Array();
+
+
 // Creating the problemObject 
 function problemObject()
 {
@@ -552,6 +561,24 @@ function initialize()
 function displayFirstProblem()
 {
 	
+}
+
+
+// Initializes the game sounds
+function initializeGameSounds()
+{
+	wrongAnswerSounds[0] = new Media("www/sounds/wrongleft.wav");
+	wrongAnswerSounds[1] = new Media("www/sounds/wrongright.wav");
+
+	closeEnoughSounds[0] = new Media("www/sounds/arrow.wav");
+	closeEnoughSounds[1] = new Media("www/sounds/cashregister.wav");
+	closeEnoughSounds[2] = new Media("www/sounds/ching.wav");
+	closeEnoughSounds[3] = new Media("www/sounds/woosh.wav");
+	
+	bullseyeSounds[0] = new Media("www/sounds/explosion2.wav");
+	bullseyeSounds[1] = new Media("www/sounds/laser.wav");
+	
+	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 }
 
 
@@ -585,20 +612,24 @@ function closeEnoughAnswer()
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
 function displayBullseyeGraphic()
 {
-	
+
 }
 
-// Plays a random sound from the bullseyeSoundArray
+// Plays a random sound from the bullseyeSounds Array
 function playBullseyeSound()
 {
-    var arrow = new Media("www/sounds/arrow.wav");
-    arrow.play();
+	var random = getRandomInteger(0,(bullseyeSounds.length - 1));
+	bullseyeSounds[random].play();
 }
 
-function playWrongAnswerSound()
+// Plays a sound when the player hasn't hit the right spot, a differnet tone depending on if the guess is too high or too low
+function playWrongAnswerSound(ballYMinusAnswer)
 {
-    var stringsound = new Media("www/sounds/pong.wav");
-    stringsound.play();
+	if(ballYMinusAnswer > 0){
+		wrongAnswerSounds[1].play();
+	} else{
+		wrongAnswerSounds[0].play();		
+	}	
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
@@ -610,9 +641,18 @@ function displayCloseEnoughGraphic()
 // Plays a random sound from the closeEnoughSoundArray
 function playCloseEnoughSound()
 {
-	
+	var random = getRandomInteger(0,(closeEnoughSounds.length - 1));
+	closeEnoughSounds[random].play();
 }
 
+// Plays a random sound from the nextLevel Array
+function playNextLevelSound()
+{
+	var random = getRandomInteger(0,(nextLevelSounds.length - 1));
+	nextLevelSounds[random].play();
+}
+	
+	
 // Increases score based on accuracy and currentTry
 function adjustScore(accuracy)
 {
@@ -657,8 +697,9 @@ function bonusGraphic()
 function nextLevel()
 {
 	currentLevel++;
-	//alert('level' + currentLevel);
 	$("#level").text(currentLevel);
+
+	playNextLevelSound();
 	
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
@@ -735,6 +776,9 @@ function initializeProbabilities()
 {
 	// emptied out b/c these are now set inside createFractionProblem2DArray
 }
+
+
+
 
 // Adjusts the problem and related problem probabilties based on accuracy 
 // and creates and displays a new problem  
@@ -831,7 +875,7 @@ function displayCurrentProblem()
 			break;
 		case 'multiplication':
 			var fractionString = currentProblem.numerator + "x" + currentProblem.denominator;
-			$("#current-problem").text(fractionString);
+			$("#multiplication-problem").text(fractionString);
 			break;
 		case 'integer':
 			break;
