@@ -96,14 +96,17 @@ function startWatchingForShaking() {
 		accelerometerFired(coords); 		
 	};
 	var fail = function(){};
-	var options = { frequency : 100 };
+	var options = {};
+	options.frequency = 100;
+	//alert("accelerometer loaded2: "+navigator.accelerometer);
+	//alert("accelerometer loaded2: "+navigator.accelerometer.watchAcceleration);
 	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
 	
-	//alert("accelerometer loaded: "+watchId);
+	//alert("accelerometer loaded3: "+watcher);
 }
 
 function accelerometerFired(coords) {
-	//alert(coords);
+	alert("Coords: "+coords);
 	if ((yVal > 0.0 && coords.x < 0.0) || (yVal < 0.0 && coords.x > 0.0)) {
 		yVal = coords.x;
 	}
