@@ -69,8 +69,6 @@ function pageIsLoaded()
 	
 	$("#settings form").submit(saveSettings);
 	$("#settings").bind("pageAnimationStart", loadSettings);
-	
-	loadSounds();
 }
 
 function gameScreenHasAppeared()
@@ -92,6 +90,9 @@ function gameScreenHasAppeared()
 	createFractionProblem2DArray();
 	createMultiplicationProblem2DArray();
 	currentProblem = fractionProblems[2][1];
+	
+	// Initialize Game sounds
+	initializeGameSounds();
 	
 	// Add ball to screen
 	addBall();
@@ -269,14 +270,14 @@ function checkAnswer(X,Y,answer,ball){
 		  case 2:
 				//show hint 
 				showArrowHint(X,Y,answer);
-				playWrongAnswerSound();
+				playWrongAnswerSound(Y - answer);
                 break;
 		  case 3:
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
 				showDenominatorHint(X,Y,answer);
-				playWrongAnswerSound();
+				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:	
 			  currentTry = 1;
@@ -561,6 +562,12 @@ var currentProblem;  // Tracks the current problem the player is working on
 var multiplicationProblems = new Array(); // Creating an Array to hold all the multiplication problems
 var highestMultiplier = 10; // The highest number for multiplication problems
 
+var wrongAnswerSounds = new Array();
+var closeEnoughSounds = new Array();
+var bullseyeSounds = new Array();
+var nextLevelSounds = new Array();
+
+
 // Creating the problemObject 
 function problemObject()
 {
@@ -590,7 +597,6 @@ function displayFirstProblem()
 	
 }
 
-
 //
 //  GAMEPLAY FUNCTIONS
 //  Functions related to levels, scoring, answers
@@ -619,29 +625,65 @@ function closeEnoughAnswer()
 }
 
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
-function displayBullseyeGraphic()
+function displayCloseEnoughGraphic()
 {
 	
 }
 
+// Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
+function displayBullseyeGraphic()
+{
+
+}
+
 /********* SOUND CODE **********/
 
-function loadSounds() {
-	arrow = new Media("www/sounds/arrow.wav");
-	stringsound = new Media("www/sounds/pong.wav");
+// Initializes the game sounds
+function initializeGameSounds()
+{
+	wrongAnswerSounds[0] = new Media("www/sounds/wrongleft.wav");
+	wrongAnswerSounds[1] = new Media("www/sounds/wrongright.wav");
+	
+	closeEnoughSounds[0] = new Media("www/sounds/arrow.wav");
+	closeEnoughSounds[1] = new Media("www/sounds/cashregister.wav");
+	closeEnoughSounds[2] = new Media("www/sounds/ching.wav");
+	closeEnoughSounds[3] = new Media("www/sounds/whoosh.wav");
+	
+	bullseyeSounds[0] = new Media("www/sounds/explosion2.wav");
+	bullseyeSounds[1] = new Media("www/sounds/laser.wav");
+	
+	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 }
 
-// Plays a random sound from the bullseyeSoundArray
-var arrow;
+// Plays a random sound from the bullseyeSounds Array
 function playBullseyeSound()
 {
-    playSoundIfSoundIsOn(arrow);
+	var random = getRandomInteger(0,(bullseyeSounds.length - 1));
+	bullseyeSounds[random].play();
 }
 
-var stringsound;
-function playWrongAnswerSound()
+// Plays a sound when the player hasn't hit the right spot, a differnet tone depending on if the guess is too high or too low
+function playWrongAnswerSound(ballYMinusAnswer)
 {
-    playSoundIfSoundIsOn(stringsound);
+	if(ballYMinusAnswer > 0){
+		playSoundIfSoundIsOn(wrongAnswerSounds[1]);
+	} else {
+		playSoundIfSoundIsOn(wrongAnswerSounds[0]);		
+	}	
+}
+
+// Plays a random sound from the closeEnoughSoundArray
+function playCloseEnoughSound()
+{
+	var random = getRandomInteger(0,(closeEnoughSounds.length - 1));
+	playSoundIfSoundIsOn(closeEnoughSounds[random]);
+}
+
+// Plays a random sound from the nextLevel Array
+function playNextLevelSound()
+{
+	var random = getRandomInteger(0,(nextLevelSounds.length - 1));
+	playSoundIfSoundIsOn(nextLevelSounds[random]);
 }
 
 function playSoundIfSoundIsOn(media) {
@@ -649,19 +691,7 @@ function playSoundIfSoundIsOn(media) {
 		media.play();
 	}
 }
-
-// Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
-function displayCloseEnoughGraphic()
-{
 	
-}
-
-// Plays a random sound from the closeEnoughSoundArray
-function playCloseEnoughSound()
-{
-	
-}
-
 // Increases score based on accuracy and currentTry
 function adjustScore(accuracy)
 {
@@ -706,8 +736,9 @@ function bonusGraphic()
 function nextLevel()
 {
 	currentLevel++;
-	//alert('level' + currentLevel);
 	$("#level").text(currentLevel);
+
+	playNextLevelSound();
 	
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
@@ -718,9 +749,28 @@ function nextLevel()
 	}   	
 	
 	if(currentLevel == 9){ 
-		currentLevelType = 'multiplication';
+		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits();
+	}
+}
+
+// Changes currentLevelType and the background of the ball to reflect that level
+function changeLevelType(levelType)
+{
+	currentLevelType = levelType;
+	
+	
+	//changes the background of the ball
+	switch(levelType){
+		case 'multiplication':
+			var newBg = "url('../images/plainball.png')";
+			$(".ballClass").css("background-image", newBg);
+			break;
+		case 'sqroot':
+			var newBg = "url('../images/sqrootball.png')";
+			$(".ballClass").css("background-image", newBg);
+			break;
 	}
 }
 
@@ -784,6 +834,9 @@ function initializeProbabilities()
 {
 	// emptied out b/c these are now set inside createFractionProblem2DArray
 }
+
+
+
 
 // Adjusts the problem and related problem probabilties based on accuracy 
 // and creates and displays a new problem  
@@ -880,7 +933,7 @@ function displayCurrentProblem()
 			break;
 		case 'multiplication':
 			var fractionString = currentProblem.numerator + "x" + currentProblem.denominator;
-			$("#current-problem").text(fractionString);
+			$("#multiplication-problem").text(fractionString);
 			break;
 		case 'integer':
 			break;
