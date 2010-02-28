@@ -710,10 +710,20 @@ function nextLevel()
 	}   	
 	
 	if(currentLevel == 9){ 
-		currentLevelType = 'multiplication';
+		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits();
 	}
+}
+
+// Changes currentLevelType and the background of the ball to reflect that level
+function changeLevelType(levelType)
+{
+	currentLevelType = levelType;
+	
+	switch
+
+	
 }
 
 
