@@ -1,0 +1,10 @@
+# These are all the files that git ignores
+#.gitignore
+.DS_Store
+.*.sw?
+*.cso
+tmp/
+*.xcodeproj/* 
+*.xcodeproj/project.pbxproj
+lib/iphone/phonegap-min.js
+lib/iphone/phonegap.js
