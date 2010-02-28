@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = true;
+var usingSimulator = false;
 
 // Global ball array
 var ball;
@@ -97,7 +97,6 @@ function gameScreenHasAppeared()
 /******* PREFERENCES CODE *******/
 function loadSettings() {
 	if (localStorage.gravity == null) {
-		alert("resetting grav");
 		localStorage.gravity = INIT_GRAVITY;
 	}
     $("#gravity").val(localStorage.gravity);
