@@ -17,23 +17,37 @@
 	height: 460px;
 }
 
+#level-screen
+{
+	background-image: url('../images/level1bg.png');
+	width: 320px;
+	height: 431px;
+	
+	margin-top: 0px;
+	position:   absolute;
+}
+
+
 .baseboardclass{
   height: 30px;
 	
 	margin-top: 400px;
 	margin-left: 10px;
 	position: absolute;
+	
+	border-style: solid;
+	border-width: thin;
 }
 
 #baseboard
 {
-   background-color: yellow;
+   background-color: white;
    width: 300px;
 }
 
 #answerboard
 {
-   background-color: green;
+   background-color: white;
    width:   0px;
 	 
    /*visibility: hidden;*/
@@ -90,7 +104,7 @@
 	width: 35px;
 	height: 26px;
 
-	margin-top: 430px;
+	margin-top: 433px;
 	margin-left: 0px;
 	position: absolute;
 	
@@ -103,7 +117,7 @@
 	width: 35px;
 	height: 26px;
 
-	margin-top: 430px;
+	margin-top: 433px;
 	margin-left: 0px;
 	position: absolute;
 	
