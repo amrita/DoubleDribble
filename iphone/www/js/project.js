@@ -27,11 +27,12 @@ var error			 = 15; // error allowed in pixels.
 var closeEnoughError = 30;
 
 //accelerometer variables to make the object bounce
-var yVal = 0.0;
+var horizontalChange = 0.0; // Maintains the state of the accelerometer
+
+// Initial gravity for the app. For dynamic gravity changes use changeGravity()
+
 var GRAVITY = 0.15;
-var gravity = GRAVITY * 50.0 / 1000.0;
-var BOUNCE_VELOCITY = -13.5;
-var velocity = 0.0;
+
 //not needed remove later 
 var yDELTA = 1.0;
 
@@ -106,26 +107,26 @@ function startWatchingForShaking() {
 }
 
 function accelerometerFired(coords) {
-	alert("Coords: "+coords);
-	if ((yVal > 0.0 && coords.x < 0.0) || (yVal < 0.0 && coords.x > 0.0)) {
-		yVal = coords.x;
+	//alert("Coords: "+coords);
+	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
+		horizontalChange = coords.x;
 	}
-	yVal += coords.x * 4.0;
+	horizontalChange += coords.x * 4.0;
 }
 
 /******* BUTTON CODE *******/
 function leftAxisClick() {
-	if (yVal > 0.0) {
-		yVal = 0.0;
+	if (horizontalChange > 0.0) {
+		horizontalChange = 0.0;
 	}
-	yVal -= yDELTA;	
+	horizontalChange -= yDELTA;	
 }
 
 function rightAxisClick() {
-	if (yVal < 0.0) {
-		yVal = 0.0;
+	if (horizontalChange < 0.0) {
+		horizontalChange = 0.0;
 	}
-	yVal += yDELTA;
+	horizontalChange += yDELTA;
 }
 
 function animationLoop()
@@ -146,15 +147,15 @@ function animationLoop()
 	
 	// Move the ball left/right
 	var left = parseInt(ball.css("left"));
-	var newLeft = left + yVal;
+	var newLeft = left + horizontalChange;
 	if (newLeft < 0) {
 		// BOUNCE
 		newLeft *= -1;
-		yVal *= -1;
+		horizontalChange *= -1;
 	} else if (newLeft > 280) {
 		// BOUNCE
 		newLeft -= (newLeft - 280); // subtract the amount over 310 from 310
-		yVal *= -1;
+		horizontalChange *= -1;
 	}
 	$(ball).css("left", newLeft);
 	
@@ -166,10 +167,6 @@ function animationLoop()
 	if (ballX >= topBaseboard){
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
-	
-	//change velocity for the next loop entry
-	velocity += gravity;
-	
 }
 
 //checks to see if the answer is correct or not 
@@ -424,18 +421,13 @@ function gameOver(){
  *                ˚    2
  */
 var _gravity;
-var _velocity;
 var _ballBounceHeight = 330.0;
 var _yInitial = 360.0; // TODO: tie this to location of baseboard
 var _roundtripTime = 2500;
 function changeGravity(newGravity) {
 	_gravity = newGravity / 1000.0;
-	//var tobesqrt = 2.0 *  _ballBounceHeight / _gravity;
 	var time = Math.sqrt( 2.0 *  _ballBounceHeight / _gravity ); 
 	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
-	//var ht = _ballBounceHeight / time;
-	//var gt = _gravity * time / 2.0;
-	//alert("initVel: "+_initialVelocity+" height: "+_ballBounceHeight+" time: "+time+" grav: "+_gravity+" sqrt: "+tobesqrt+" ht: "+ht+" gt: "+gt);
 }
 
 /**
@@ -457,9 +449,6 @@ function getTopForTime() {
 	} else {
 		var timeDelta = _newTime - _oldTime;
 		newTop = _yInitial + timeDelta * ( _initialVelocity + _gravity * timeDelta / 2.0 );
-		//var vel = timeDelta * _initialVelocity;
-		//var acc = _gravity * timeDelta * timeDelta / 2.0;
-		//alert("nt: "+newTop+" timeDelta: "+timeDelta+" initVel: "+_initialVelocity+" grav: "+_gravity+" vel: "+vel+" acc: "+acc);
 	}
 	
 	return parseInt( newTop );
