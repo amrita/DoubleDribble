@@ -1,5 +1,5 @@
 // Project settings
-$.jQTouch({
+var jQT = new $.jQTouch({
 	icon: 'images/icon.png',
 	startupScreen: 'images/splash.png',
 	addGlossToIcon: false,
@@ -7,6 +7,9 @@ $.jQTouch({
 });
 
 //GLOBAL VARIABLES
+
+// Set this to true if you're using the iPhone Simulator
+var usingSimulator = true;
 
 // Global ball array
 var ball;
@@ -30,8 +33,10 @@ var closeEnoughError = 30;
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
+var INIT_GRAVITY = 0.15;
 
-var GRAVITY = 0.15;
+// Used to turn sound on or off
+var isSoundOn = true;
 
 //not needed remove later 
 var yDELTA = 1.0;
@@ -52,8 +57,11 @@ $(function() {
 
 function pageIsLoaded()
 {
-
 	$("#game-screen").bind("pageAnimationEnd", gameScreenHasAppeared);
+	
+	
+	$("#settings form").submit(saveSettings);
+	$("#settings").bind("pageAnimationStart", loadSettings);
 }
 
 function gameScreenHasAppeared()
@@ -82,16 +90,31 @@ function gameScreenHasAppeared()
 	// Set that we're starting the game
 	firstProblemInTheGame = true;
 	
-	changeGravity(GRAVITY);
+	changeGravity(INIT_GRAVITY);
 	_oldTime = new Date().getTime();
 }
 
+/******* PREFERENCES CODE *******/
+function loadSettings() {
+	if (localStorage.gravity == null) {
+		alert("resetting grav");
+		localStorage.gravity = INIT_GRAVITY;
+	}
+    $("#gravity").val(localStorage.gravity);
+}
+
+function saveSettings() {
+	//alert("Saving grav: "+ $("#gravity").val());
+	INIT_GRAVITY = parseFloat($("#gravity").val());
+    localStorage.gravity = INIT_GRAVITY;
+    jQT.goBack();
+    return false;
+}
 /******* ACCELEROMETER CODE *******/
 function startWatchingForShaking() {
-	//if (typeof(PhoneGap) != 'undefined') {
-	//	alert("accel: "+ navigator.accelerometer.watchAcceleration);
-	//	return;
-	//}
+	if (usingSimulator) {
+		return;
+	}
 	
 	var win = function(coords){
 		accelerometerFired(coords); 		
@@ -412,7 +435,7 @@ function gameOver(){
   alert("Game Over !!");
 }
 
-/********* GRAVITY CODE **********/
+/********* INIT_GRAVITY CODE **********/
 
 /**
  * Improved gravity

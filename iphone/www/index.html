@@ -27,6 +27,7 @@
 		</div>
 		<ul class="rounded">
 			<li class="arrow"><a href="#game-screen">Play!</a></li>
+			<li class="arrow"><a href="#settings">Preferences</a></li>
 		</ul>
 	</div>
 
@@ -55,6 +56,18 @@
 		  </div>
 		</div>
 	</div>
-
+	<div id="settings">
+		<div class="toolbar">
+			<h1>Settings</h1>
+			<a class="button cancel" href="#">Cancel</a>
+		</div>
+		<form method="post">
+			<ul>
+				<li><span>Gravity: </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
+				<li>Sound: <input type="checkbox" name="sound" id="sound" /></li>
+				<li><input type="submit" class="submit" value="Save Changes" /></li>
+			</ul>
+		</form>
+	</div>
 </body>
 </html>
