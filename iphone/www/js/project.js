@@ -659,7 +659,7 @@ function initializeGameSounds()
 function playBullseyeSound()
 {
 	var random = getRandomInteger(0,(bullseyeSounds.length - 1));
-	bullseyeSounds[random].play();
+	playSoundIfSoundIsOn(bullseyeSounds[random]);
 }
 
 // Plays a sound when the player hasn't hit the right spot, a differnet tone depending on if the guess is too high or too low
