@@ -23,6 +23,13 @@ var answerY;
 //top of the baseboard
 var topBaseboard;
 
+//baseboard offset
+var bboffset = 10;
+
+//baseboard number colors
+var bbcolors  = ['black','blue','green','purple'];
+var bbcolorid = 0;
+
 var error			 = 15; // error allowed in pixels. 
 var closeEnoughError = 30;
 
@@ -64,6 +71,9 @@ function gameScreenHasAppeared()
 	
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
+	
+	//set background image
+	setLevelBackgroundImage();
 	
 	//set level parameters
 	setBaseboardLimits();
@@ -112,6 +122,11 @@ function accelerometerFired(coords) {
 		horizontalChange = coords.x;
 	}
 	horizontalChange += coords.x * 4.0;
+}
+
+//initialize baseboard settings
+function initBaseBoard(){
+	this.offset = 10;
 }
 
 /******* BUTTON CODE *******/
@@ -178,11 +193,13 @@ function checkAnswer(X,Y,answer,ball){
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
-		displayAnswerBoard(answerY);
+		
 		if (Y == answer){
-		    bullseyeAnswer(answer);
+			displayAnswerBoardDeadOn(answerY);
+		  bullseyeAnswer(answer);
 		}
 		else{
+			displayAnswerBoardClose(answerY);
 			closeEnoughAnswer(answer);
 		}
 		
@@ -230,7 +247,7 @@ function checkAnswer(X,Y,answer,ball){
 				clearInterval(timerLoop);	
 				clearArrowHint();
 				clearDenominatorHint();
-				displayAnswerBoard(answerY);
+				displayAnswerBoardDeadOn(answerY);
 				gameOver();	
 				break;
 		  default:
@@ -266,12 +283,23 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	//everything is now offset by 10 pixels
-	answerY    = problemId * (phoneWidth / (bMax - bMin)) + 10;
+	answerY    = problemId * (phoneWidth / (bMax - bMin)) + bboffset;
+
 }
+
+function setLevelBackgroundImage(){
+  //$("#level-screen").css("background-image","url('../images/level1bg.png')");	
+}
+
 
 function setBaseboardLimits(){
 	$("#baseMin").text(baseboardMin);
 	$("#baseMax").text(baseboardMax);
+
+	$("#baseMin").css("color",bbcolors[bbcolorid]).fadeIn('slow');
+	$("#baseMax").css("color",bbcolors[bbcolorid]).fadeIn('slow');
+	
+	bbcolorid++; // change baseboard number colors next time when the numbers change 
 }
 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
@@ -280,7 +308,7 @@ function computeBoardLocation(problemId,bMin,bMax){
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	// everything is now offset by 10 pixels; 
-	var answer    = problemId * (phoneWidth / (bMax - bMin)) + 10;
+	var answer    = problemId * (phoneWidth / (bMax - bMin)) + bboffset;
 	
 	return answer;
 }
@@ -391,16 +419,32 @@ function clearDenominatorHint(denom){
 }
 
 // if the correct answer was selected then light up the board 
-function displayAnswerBoard(answerY){
+function displayAnswerBoardClose(answerY){
 	//set the newWidth to where the correct answer point is
-	var newWidth = answerY;
+	var newWidth = answerY - bboffset;
 	
+	$("#answerboard").css("background-color","#ff7200");
 	$("#answerboard").css("width",newWidth);
 	
 	//make it visible 
 	$("#answerboard").fadeIn('fast');
   
 }
+
+
+// if the correct answer was selected then light up the board 
+function displayAnswerBoardDeadOn(answerY){
+	//set the newWidth to where the correct answer point is
+	var newWidth = answerY - bboffset;
+	
+	$("#answerboard").css("background-color","red");
+	$("#answerboard").css("width",newWidth);
+	
+	//make it visible 
+	$("#answerboard").fadeIn('fast');
+  
+}
+
 
 // clear the answer board
 function clearAnswerBoard(answerY){
