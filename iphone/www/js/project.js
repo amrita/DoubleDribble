@@ -40,7 +40,7 @@ var closeEnoughError = 30;
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
-var INIT_GRAVITY = 8.15;
+var INIT_GRAVITY = 0.15;
 
 // Used to turn sound on or off
 var isSoundOn = true;
