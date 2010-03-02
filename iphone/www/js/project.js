@@ -509,7 +509,7 @@ var highestLevel = 8;    // The highest level achieveable in the game
 var currentLevelType = 'fraction';  // Tracks the current type of level 
 var highestDenominator = [0,4,8,12,20,4,8,12,20];  // Holds the largest denominator available for each level
 var problemsFinishedThisLevel = 0; // Tracks how many problems a player has completed on this current level
-var numProblemsPerLevel = 20; // Tracks how many problems a player completes per level, 
+var numProblemsPerLevel = 15; // Tracks how many problems a player completes per level, 
 
 var currentTry = 1;  // Tracks how many tries the player has attempted on currentProblem. First try = 1;
 var maxTries = 4; // Sets the maximum amount of tries a player may make on a singleProblem
@@ -520,7 +520,7 @@ var baseboardMax = 1; // Tracks the upper number on the baseboard
 var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
 
 var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
-var skunk = 2; // The number of continuous answers needed to skunk a level
+var skunk = 5; // The number of continuous answers needed to skunk a level
 
 var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
 var currentProblem;  // Tracks the current problem the player is working on
@@ -570,13 +570,24 @@ function initializeGameSounds()
 	wrongAnswerSounds[0] = new Media("www/sounds/wrongleft.wav");
 	wrongAnswerSounds[1] = new Media("www/sounds/wrongright.wav");
 
-	closeEnoughSounds[0] = new Media("www/sounds/arrow.wav");
+	closeEnoughSounds[0] = new Media("www/sounds/laser.wav");
 	closeEnoughSounds[1] = new Media("www/sounds/cashregister.wav");
 	closeEnoughSounds[2] = new Media("www/sounds/ching.wav");
-	closeEnoughSounds[3] = new Media("www/sounds/woosh.wav");
+	closeEnoughSounds[3] = new Media("www/sounds/arrow.wav");
 	
 	bullseyeSounds[0] = new Media("www/sounds/explosion2.wav");
-	bullseyeSounds[1] = new Media("www/sounds/laser.wav");
+	bullseyeSounds[1] = new Media("www/sounds/perfect.wav");
+	bullseyeSounds[2] = new Media("www/sounds/precise.wav");
+	bullseyeSounds[3] = new Media("www/sounds/yes.wav");
+	bullseyeSounds[4] = new Media("www/sounds/onthedot.wav");	
+	bullseyeSounds[5] = new Media("www/sounds/immaculate.wav");
+	bullseyeSounds[6] = new Media("www/sounds/onthemoney.wav");
+	bullseyeSounds[7] = new Media("www/sounds/supreme.wav");
+	bullseyeSounds[8] = new Media("www/sounds/ideal.wav");	
+	bullseyeSounds[9] = new Media("www/sounds/spotless.wav");
+	bullseyeSounds[10] = new Media("www/sounds/sublime.wav");
+	bullseyeSounds[11] = new Media("www/sounds/flawless.wav");
+	
 	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 }
@@ -587,7 +598,7 @@ function initializeGameSounds()
 //  Functions related to levels, scoring, answers
 //
 
-// Calls the appropriate bulleye sound and graphic, adjusts the score, and pulls the next problem
+// Calls the appropriate bullseye sound and graphic, adjusts the score, and pulls the next problem
 function bullseyeAnswer(answer)
 {
 	//lights up the baseboard to the correct value
@@ -615,11 +626,12 @@ function displayBullseyeGraphic()
 
 }
 
-// Plays a random sound from the bullseyeSounds Array
+// Plays the explosion sound, plus a random sound from the bullseyeSounds Array (but only up to the level of the current level)
 function playBullseyeSound()
 {
-	var random = getRandomInteger(0,(bullseyeSounds.length - 1));
-	bullseyeSounds[random].play();
+	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
+	bullseyeSounds[0].play();  // Exposion sound
+	bullseyeSounds[random].play();  // + random sound = delicious
 }
 
 // Plays a sound when the player hasn't hit the right spot, a differnet tone depending on if the guess is too high or too low
@@ -638,10 +650,10 @@ function displayCloseEnoughGraphic()
 	
 }
 
-// Plays a random sound from the closeEnoughSoundArray
+// Plays a random sound from the closeEnoughSoundArray, but only up to the level of the current level
 function playCloseEnoughSound()
 {
-	var random = getRandomInteger(0,(closeEnoughSounds.length - 1));
+	var random = getRandomInteger(0,Math.min((closeEnoughSounds.length - 1), (currentLevel - 1)));
 	closeEnoughSounds[random].play();
 }
 
