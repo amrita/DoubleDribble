@@ -40,10 +40,13 @@ var closeEnoughError = 30;
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
-var INIT_GRAVITY = 0.15;
+var INIT_GRAVITY = 8.15;
 
 // Used to turn sound on or off
 var isSoundOn = true;
+
+// whether the game is over
+var gameIsOver = true;
 
 //not needed remove later 
 var yDELTA = 1.0;
@@ -69,6 +72,7 @@ function pageIsLoaded()
 	
 	$("#settings form").submit(saveSettings);
 	$("#settings").bind("pageAnimationStart", loadSettings);
+	
 }
 
 function gameScreenHasAppeared()
@@ -76,9 +80,6 @@ function gameScreenHasAppeared()
 	
 	//get the x value for the top of the baseboard
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
-	
-	// This is the animation timer
-	timerLoop = setInterval("animationLoop()", 50);
 	
 	//set background image
 	setLevelBackgroundImage();
@@ -100,11 +101,16 @@ function gameScreenHasAppeared()
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
-	// Set that we're starting the game
-	firstProblemInTheGame = true;
+	// Show game start and remove game over
+	$("#game-over").fadeOut("fast");
+	$("#game-start").fadeOut("slow");
 	
+	// Set up gravity and initialize oldTime for ball movement
 	changeGravity(INIT_GRAVITY);
 	_oldTime = new Date().getTime();
+	
+	// Reset game state
+	restartGame();
 }
 
 /******* PREFERENCES CODE *******/
@@ -134,6 +140,7 @@ function saveSettings() {
     jQT.goBack();
     return false;
 }
+
 /******* ACCELEROMETER CODE *******/
 function startWatchingForShaking() {
 	if (usingSimulator) {
@@ -183,10 +190,10 @@ function rightAxisClick() {
 
 function animationLoop()
 {
-	var newBottom;
-	var height;
-	var width;
-	var left;
+	if (gameIsOver) {
+		alert("Shouldn't be called");
+		return;
+	}
 	
 	// Move the ball up/down	
 	var newTop = getTopForTime();
@@ -206,16 +213,16 @@ function animationLoop()
 		horizontalChange *= -1;
 	} else if (newLeft > 280) {
 		// BOUNCE
-		newLeft -= (newLeft - 280); // subtract the amount over 310 from 310
+		newLeft -= (newLeft - 280); // subtract the amount over 280 from 280
 		horizontalChange *= -1;
 	}
 	$(ball).css("left", newLeft);
 	
 	//set the current x,y co-ordinates of the object
 	setObjectXY(ball);
-
 	
 	//if the object has hit the baseboard check the answer
+	// TODO: use newTop + BALL_HEIGHT -> pre-calculated constant to make this calculation (faster)
 	if (ballX >= topBaseboard){
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
@@ -233,7 +240,7 @@ function checkAnswer(X,Y,answer,ball){
 		
 		if (Y == answer){
 			displayAnswerBoardDeadOn(answerY);
-		  bullseyeAnswer(answer);
+			bullseyeAnswer(answer);
 		}
 		else{
 			displayAnswerBoardClose(answerY);
@@ -280,7 +287,7 @@ function checkAnswer(X,Y,answer,ball){
 				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:	
-			  currentTry = 1;
+				currentTry = 1;
 				clearInterval(timerLoop);	
 				clearArrowHint();
 				clearDenominatorHint();
@@ -380,7 +387,11 @@ function initializePositionForBall(ball)
 	
 	// Finally, update the ball's position
 	ball.css("top", newBallTop);
-	ball.css("left", newBallLeft);
+	if (usingSimulator) {
+		ball.css("left", "150px");
+	} else {
+		ball.css("left", newBallLeft);
+	}
 }
 
 // show either the left or the right hint arrow based on the position
@@ -490,7 +501,42 @@ function clearAnswerBoard(answerY){
 
 
 function gameOver(){
-  alert("Game Over !!");
+	//alert("Game Over !!");
+	$("#game-over").fadeIn('fast');
+	gameIsOver = true;
+}
+
+function goHome() {
+	jQT.goTo('#home', 'cube'); 
+}
+
+function restartGame() {
+	$("#game-over").fadeOut('fast');
+	
+	// Set that we're starting the game
+	firstProblemInTheGame = true;
+	
+	restartLevel(1);
+}
+
+// This resets all values for a 'new' game.
+function restartLevel(level) {
+	
+	// level is undefined when the UI calls this function
+	if (level == undefined) {
+		level = currentLevel;
+		$("#game-over").fadeOut('fast');
+	}
+	
+	setScore(0);
+	setLevel(level);
+	
+	// This is the animation timer
+	timerLoop = setInterval("animationLoop()", 50);
+
+	gameIsOver = false;
+	
+	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()?
 }
 
 /********* INIT_GRAVITY CODE **********/
@@ -723,7 +769,11 @@ function adjustScore(accuracy)
 // Increases playerScore by the amount passed, and redisplays the new value
 function increaseScore(increase)
 {
-	playerScore = playerScore + increase;
+	setScore(playerScore + increase);
+}
+
+function setScore(score) {
+	playerScore = score;
 	$("#score").text(playerScore);
 }
 
@@ -733,13 +783,16 @@ function bonusGraphic()
 }
 
 // Controls the sequences of levels
-function nextLevel()
+function nextLevel() {
+	setLevel(currentLevel + 1);
+	playNextLevelSound();
+}
+
+function setLevel(level)
 {
-	currentLevel++;
+	currentLevel = level;
 	$("#level").text(currentLevel);
 
-	playNextLevelSound();
-	
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
 	
