@@ -27,6 +27,7 @@
 		</div>
 		<ul class="rounded">
 			<li class="arrow"><a href="#game-screen">Play!</a></li>
+			<li class="arrow"><a href="#settings">Preferences</a></li>
 		</ul>
 	</div>
 
@@ -39,6 +40,17 @@
 			  <div id="ball" class="ballClass">
 				  <div id="numerator" class="fraction-text">_</div>
 				  <div id="denominator" class="fraction-text">_</div>
+			  </div>
+			  <div id="game-over">
+				<h2>Game Over</h2>
+				<div id="game-over-buttons">
+					<input type="button" value="Restart Level" onclick="restartLevel();" /><br />
+					<input type="button" value="Restart Game" onclick="restartGame();" /><br />
+					<input type="button" value="Home Screen" onclick="goHome();" />
+				</div>
+			  </div>
+			  <div id="game-start">
+				<h1>Good Luck!</h1>
 			  </div>
 			</div>
 			<div id="baseboard" class="baseboardclass">
@@ -57,6 +69,18 @@
 			
 		</div>
 	</div>
-
+	<div id="settings">
+		<div class="toolbar">
+			<h1>Settings</h1>
+			<a class="button cancel" href="#">Cancel</a>
+		</div>
+		<form method="post">
+			<ul>
+				<li><span>Gravity: </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
+				<li>Sound: <input type="checkbox" name="sound" id="sound" /></li>
+				<li><input type="submit" class="submit" value="Save Changes" /></li>
+			</ul>
+		</form>
+	</div>
 </body>
 </html>
