@@ -331,8 +331,8 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 
 }
 
-function setLevelBackgroundImage(){
-  //$("#level-screen").css("background-image","url('../images/level1bg.png')");	
+function setLevelBackgroundImage(num){
+  $("#level-screen").css("background-image","url('../images/level" + num + "bg.png')");	
 }
 
 
@@ -824,6 +824,9 @@ function setLevel(level)
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits();
 	}
+	
+	// Changes background to new level background
+	setLevelBackgroundImage(currentLevel);
 }
 
 // Changes currentLevelType and the background of the ball to reflect that level
