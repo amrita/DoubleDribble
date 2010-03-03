@@ -332,7 +332,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelBackgroundImage(num){
-  $("#level-screen").css("background-image","url('../images/level" + num + "bg.png')");	
+//  $("#level-screen").css("background-image","url('../images/level" + num + "bg.png')");	
 }
 
 
