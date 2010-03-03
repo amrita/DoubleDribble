@@ -59,6 +59,35 @@ var yDELTA = 1.0;
 // whether or not the player is playing the first problem in the game
 var firstProblemInTheGame;
 
+var currentLevel = 1;    // Tracks the player's current level
+var highestLevel = 8;    // The highest level achieveable in the game
+var currentLevelType = 'fraction';  // Tracks the current type of level 
+var highestDenominator = [0,4,8,12,20,4,8,12,20];  // Holds the largest denominator available for each level
+var problemsFinishedThisLevel = 0; // Tracks how many problems a player has completed on this current level
+var numProblemsPerLevel = 15; // Tracks how many problems a player completes per level, 
+
+var currentTry = 1;  // Tracks how many tries the player has attempted on currentProblem. First try = 1;
+var maxTries = 4; // Sets the maximum amount of tries a player may make on a singleProblem
+var playerScore = 0; // Tracks players score
+
+var baseboardMin = 0; // Tracks the lower number on the baseboard
+var baseboardMax = 1; // Tracks the upper number on the baseboard
+var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
+
+var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
+
+var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
+var currentProblem;  // Tracks the current problem the player is working on
+
+var multiplicationProblems = new Array(); // Creating an Array to hold all the multiplication problems
+var highestMultiplier = 10; // The highest number for multiplication problems
+
+var wrongAnswerSounds = new Array();
+var closeEnoughSounds = new Array();
+var bullseyeSounds = new Array();
+var nextLevelSounds = new Array();
+
+
 // Initialization method
 $(function() {
   
@@ -69,6 +98,7 @@ $(function() {
   
   $(document).ready(pageIsLoaded);
 });
+
 
 function pageIsLoaded()
 {
@@ -87,7 +117,7 @@ function gameScreenHasAppeared()
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
 	
 	//set background image
-	setLevelBackgroundImage();
+	setLevelBackgroundImage(1);
 	
 	//set level parameters
 	setBaseboardLimits();
@@ -341,8 +371,9 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 
 }
 
-function setLevelBackgroundImage(){
-  //$("#level-screen").css("background-image","url('../images/level1bg.png')");	
+function setLevelBackgroundImage(num){
+	var newBg = "url('images/level" + num + "bg.png')";
+   $("#level-screen").css("background-image",newBg);	
 }
 
 
@@ -597,36 +628,6 @@ function getTopForTime() {
 
 /********* LEVEL CODE **********/
 
-// Global variables
-var currentLevel = 1;    // Tracks the player's current level
-var highestLevel = 8;    // The highest level achieveable in the game
-var currentLevelType = 'fraction';  // Tracks the current type of level 
-var highestDenominator = [0,4,8,12,20,4,8,12,20];  // Holds the largest denominator available for each level
-var problemsFinishedThisLevel = 0; // Tracks how many problems a player has completed on this current level
-var numProblemsPerLevel = 15; // Tracks how many problems a player completes per level, 
-
-var currentTry = 1;  // Tracks how many tries the player has attempted on currentProblem. First try = 1;
-var maxTries = 4; // Sets the maximum amount of tries a player may make on a singleProblem
-var playerScore = 0; // Tracks players score
-
-var baseboardMin = 0; // Tracks the lower number on the baseboard
-var baseboardMax = 1; // Tracks the upper number on the baseboard
-var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
-
-var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
-
-var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
-var currentProblem;  // Tracks the current problem the player is working on
-
-var multiplicationProblems = new Array(); // Creating an Array to hold all the multiplication problems
-var highestMultiplier = 10; // The highest number for multiplication problems
-
-var wrongAnswerSounds = new Array();
-var closeEnoughSounds = new Array();
-var bullseyeSounds = new Array();
-var nextLevelSounds = new Array();
-
-
 // Creating the problemObject 
 function problemObject()
 {
@@ -838,6 +839,9 @@ function setLevel(level)
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits();
 	}
+	
+	// Changes background to new level background
+	setLevelBackgroundImage(currentLevel);
 }
 
 // Changes currentLevelType and the background of the ball to reflect that level
