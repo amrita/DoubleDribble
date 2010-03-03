@@ -643,8 +643,6 @@ function displayFirstProblem()
 	
 }
 
-<<<<<<< HEAD
-
 // Initializes the game sounds
 function initializeGameSounds()
 {
@@ -673,9 +671,6 @@ function initializeGameSounds()
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 }
 
-
-=======
->>>>>>> db5fcb39c1bb47c499d200df91ec8ef2a36926fa
 //
 //  GAMEPLAY FUNCTIONS
 //  Functions related to levels, scoring, answers
@@ -715,40 +710,15 @@ function displayBullseyeGraphic()
 
 }
 
-<<<<<<< HEAD
 // Plays the explosion sound, plus a random sound from the bullseyeSounds Array (but only up to the level of the current level)
 function playBullseyeSound()
 {
 	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
 	bullseyeSounds[0].play();  // Exposion sound
 	bullseyeSounds[random].play();  // + random sound = delicious
-=======
+}
+
 /********* SOUND CODE **********/
-
-// Initializes the game sounds
-function initializeGameSounds()
-{
-	wrongAnswerSounds[0] = new Media("www/sounds/wrongleft.wav");
-	wrongAnswerSounds[1] = new Media("www/sounds/wrongright.wav");
-	
-	closeEnoughSounds[0] = new Media("www/sounds/arrow.wav");
-	closeEnoughSounds[1] = new Media("www/sounds/cashregister.wav");
-	closeEnoughSounds[2] = new Media("www/sounds/ching.wav");
-	closeEnoughSounds[3] = new Media("www/sounds/whoosh.wav");
-	
-	bullseyeSounds[0] = new Media("www/sounds/explosion2.wav");
-	bullseyeSounds[1] = new Media("www/sounds/laser.wav");
-	
-	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
-}
-
-// Plays a random sound from the bullseyeSounds Array
-function playBullseyeSound()
-{
-	var random = getRandomInteger(0,(bullseyeSounds.length - 1));
-	playSoundIfSoundIsOn(bullseyeSounds[random]);
->>>>>>> db5fcb39c1bb47c499d200df91ec8ef2a36926fa
-}
 
 // Plays a sound when the player hasn't hit the right spot, a differnet tone depending on if the guess is too high or too low
 function playWrongAnswerSound(ballYMinusAnswer)
@@ -760,7 +730,6 @@ function playWrongAnswerSound(ballYMinusAnswer)
 	}	
 }
 
-<<<<<<< HEAD
 // Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
 function displayCloseEnoughGraphic()
 {
@@ -772,13 +741,6 @@ function playCloseEnoughSound()
 {
 	var random = getRandomInteger(0,Math.min((closeEnoughSounds.length - 1), (currentLevel - 1)));
 	closeEnoughSounds[random].play();
-=======
-// Plays a random sound from the closeEnoughSoundArray
-function playCloseEnoughSound()
-{
-	var random = getRandomInteger(0,(closeEnoughSounds.length - 1));
-	playSoundIfSoundIsOn(closeEnoughSounds[random]);
->>>>>>> db5fcb39c1bb47c499d200df91ec8ef2a36926fa
 }
 
 // Plays a random sound from the nextLevel Array
