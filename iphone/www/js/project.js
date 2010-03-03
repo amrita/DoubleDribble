@@ -8,6 +8,14 @@ var jQT = new $.jQTouch({
 
 //GLOBAL VARIABLES
 
+// The number of continuous answers needed to skunk a level
+var skunk = 5; 
+
+// Initial gravity for the app. For dynamic gravity changes use changeGravity()
+var INIT_GRAVITY = 0.15;
+// How much gravity is increased on success
+var GRAVITY_CHANGE = .001;
+
 // Set this to true if you're using the iPhone Simulator
 var usingSimulator = false;
 
@@ -38,9 +46,6 @@ var closeEnoughError = 30;
 
 //accelerometer variables to make the object bounce
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
-
-// Initial gravity for the app. For dynamic gravity changes use changeGravity()
-var INIT_GRAVITY = 0.15;
 
 // Used to turn sound on or off
 var isSoundOn = true;
@@ -255,6 +260,11 @@ function checkAnswer(X,Y,answer,ball){
 		clearArrowHint();
 		//clear the number line hints
 		clearDenominatorHint(olddenom);
+		
+		if (currentTry == 1) {
+			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
+		}
+		
 		//reset current try to 1
 		currentTry = 1;
 		
@@ -557,6 +567,10 @@ function changeGravity(newGravity) {
 	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
 }
 
+function getAdjustedGravity() {
+	return _gravity * 1000.0;
+}
+
 /**
  * Get the trajectory from the given time.
  *                       1   2              1  
@@ -600,7 +614,6 @@ var baseboardMax = 1; // Tracks the upper number on the baseboard
 var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
 
 var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
-var skunk = 5; // The number of continuous answers needed to skunk a level
 
 var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
 var currentProblem;  // Tracks the current problem the player is working on
@@ -802,6 +815,7 @@ function bonusGraphic()
 
 // Controls the sequences of levels
 function nextLevel() {
+	_gravity = INIT_GRAVITY;	// Reset the gravity after each level
 	setLevel(currentLevel + 1);
 	playNextLevelSound();
 }
