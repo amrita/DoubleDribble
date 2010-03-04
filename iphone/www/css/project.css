@@ -177,12 +177,13 @@
 
 #game-start {
 	position: absolute;
-	top: 100px;
-	left: 90px;
-	width: 140px;
-	height: 120px;
+	top: 130px;
+	left: 70px;
+	width: 210px;
+	height: 40px;
 	border: 3px solid red;
 	background: #0DBEFF;
+	
 }
 
 #game-over {
@@ -193,6 +194,8 @@
 	height: 120px;
 	border: 3px solid red;
 	background: #0DBEFF;
+	
+	visibility: hidden;
 }
 
 #game-over-buttons {

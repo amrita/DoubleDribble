@@ -136,8 +136,7 @@ function gameScreenHasAppeared()
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
-	// Show game start and remove game over
-	$("#game-over").fadeOut("fast");
+	// Show game start
 	$("#game-start").fadeOut("slow");
 	
 	// Set up gravity and initialize oldTime for ball movement
@@ -543,7 +542,9 @@ function clearAnswerBoard(answerY){
 
 function gameOver(){
 	//alert("Game Over !!");
-	$("#game-over").fadeIn('fast');
+	$("#game-over").css("visibility", "visible");
+	$("#game-over").fadeIn("slow");
+	
 	gameIsOver = true;
 }
 
