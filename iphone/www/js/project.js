@@ -70,7 +70,7 @@ var baseboardMax = 1; // Tracks the upper number on the baseboard
 var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
 
 var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
-var skunk = 5; // The number of continuous answers needed to skunk a level
+var skunk = 2; // The number of continuous answers needed to skunk a level
 
 var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
 var currentProblem;  // Tracks the current problem the player is working on
@@ -843,11 +843,11 @@ function changeLevelType(levelType)
 	//changes the background of the ball
 	switch(levelType){
 		case 'multiplication':
-			var newBg = "url('../images/plainball.png')";
+			var newBg = "url('images/plainball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
 		case 'sqroot':
-			var newBg = "url('../images/sqrootball.png')";
+			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
 	}
