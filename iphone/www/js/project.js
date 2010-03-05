@@ -152,13 +152,19 @@ function loadSettings() {
 	if (localStorage.gravity == null) {
 		localStorage.gravity = INIT_GRAVITY;
 	}
+    $("#gravity").val(localStorage.gravity);
+	
+	// Sound
 	if (localStorage.sound == null) {
+		alert("sound local storage null");
 		localStorage.sound = isSoundOn;
 	} else {
-		isSoundOn = localStorage.sound;
+		isSoundOn = localStorage.sound == "true";
 	}
-    $("#gravity").val(localStorage.gravity);
-    $("#sound").val(localStorage.sound);
+	if (isSoundOn) {
+	//alert("sound("+localStorage.sound+") val("+value+")");
+		$("#sound").val(["soundOn"]);
+	}
 }
 
 function saveSettings() {
@@ -169,7 +175,7 @@ function saveSettings() {
 	
 	// Sound
 	isSoundOn = $("#sound").is(":checked");
-	//alert("sound: "+isSoundOn);
+	localStorage.sound = isSoundOn;
 	
     jQT.goBack();
     return false;
@@ -413,6 +419,8 @@ function addBall()
 
 function initializePositionForBall(ball)
 {
+	alert("Sound ball: "+isSoundOn);
+	
 	// We will position the ball above the top of the screen and at a random x position
 	var ballHeight = parseInt(ball.css("height"));
 	var ballWidth = parseInt(ball.css("width"));
@@ -729,8 +737,8 @@ function displayBullseyeGraphic()
 function playBullseyeSound()
 {
 	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
-	bullseyeSounds[0].play();  // Exposion sound
-	bullseyeSounds[random].play();  // + random sound = delicious
+	playSoundIfSoundIsOn(bullseyeSounds[0]);  // Exposion sound
+	playSoundIfSoundIsOn(bullseyeSounds);  // + random sound = delicious
 }
 
 /********* SOUND CODE **********/
@@ -755,7 +763,7 @@ function displayCloseEnoughGraphic()
 function playCloseEnoughSound()
 {
 	var random = getRandomInteger(0,Math.min((closeEnoughSounds.length - 1), (currentLevel - 1)));
-	closeEnoughSounds[random].play();
+	playSoundIfSoundIsOn(closeEnoughSounds[random]);
 }
 
 // Plays a random sound from the nextLevel Array
