@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 5; 
+var skunk = 2; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -769,7 +769,7 @@ function playBullseyeSound()
 {
 	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
 	playSoundIfSoundIsOn(bullseyeSounds[0]);  // Exposion sound
-	playSoundIfSoundIsOn(bullseyeSounds);  // + random sound = delicious
+	playSoundIfSoundIsOn(bullseyeSounds[random]);  // + random sound = delicious
 }
 
 /********* SOUND CODE **********/
@@ -856,7 +856,7 @@ function bonusGraphic()
 
 // Controls the sequences of levels
 function nextLevel() {
-	_gravity = INIT_GRAVITY;	// Reset the gravity after each level
+	changeGravity(INIT_GRAVITY);	// Reset the gravity after each level
 	setLevel(currentLevel + 1);
 	playNextLevelSound();
 }
