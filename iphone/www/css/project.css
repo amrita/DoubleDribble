@@ -27,10 +27,13 @@
 }
 
 #aboutmenu{
-  background-image: url('../images/splashmenublank.png');
   top:  420px;
 	left: 80px;
 	position: absolute;
+}
+
+#about{
+  background-image: url('../images/splashmenublank.png');
 }
 
 #full-screen-area

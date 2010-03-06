@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 5; 
+var skunk = 1; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -513,6 +513,7 @@ function clearArrowHint(){
 	
 }
 
+
 // show either the left or the right hint arrow based on the position
 // of the ball as opposed to the correct answer 
 function showDenominatorHint(X,Y,answer){
@@ -520,16 +521,17 @@ function showDenominatorHint(X,Y,answer){
 	var decimalvalue;
 	var answer;
 	
-	denom = currentProblem.denominator;
+	var denom = currentProblem.denominator;
+	var numer = currentProblem.numerator;
 	
-	//compute points on the number line based on the denominator
-	for (i = 1; i <= denom; i++){
-		
-		//compute the decimal value of the point
+	//compute points on the number line
+	i = 1;
+	while ( (i / denom) < baseboardMax){
+	  //compute the decimal value of the point
 	  decimalvalue	= i / denom; 
 		
 		//compute the pixel where it should be on the baseboard 
-		answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
+	  answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
 		
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
@@ -539,13 +541,24 @@ function showDenominatorHint(X,Y,answer){
 		
 		//move the hint to the correct place on the number line
 		pHint.css("margin-left",answer);
-
-	}
+		
+		//if the value of decimal value of this hint is 1, change its color to orange
+		if (decimalvalue == 1){
+		  pHint.css("background-color","#ff7200");	
+		}
+		
+		//inc i
+		i++;
+		
+	} //while ends 
 }
 
 function clearDenominatorHint(denom){
-  for (i = 1; i <= denom; i++){
+  //for (i = 1; i <= denom; i++){
+	var i = 1;
+  while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
+		i++;
 	}
 }
 
