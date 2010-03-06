@@ -70,17 +70,17 @@
 	<div id="settings">
 		<div class="toolbar">
 			<h1>Settings</h1>
-			<a class="button cancel" href="#">Cancel</a>
+			<a class="button back" href="#">Back</a>
 		</div>
 		<form method="post">
 			<ul>
-				<li><span>Gravity: </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
-				<li>Sound: <span class="toggle"><input type="checkbox" name="sound" id="sound" value="soundOn" /></span></li>
+				<li>Sound <span class="toggle"><input type="checkbox" name="sound" id="sound" value="soundOn" /></span></li>
+				<li><span>Gravity </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
 				<li>Right Answer Gravity Change
-					<select id="gravity">
-						<option value ="g-static">Static (no change)</option>
-						<option value ="g-min">Small Increase: .01</option>
-						<option value ="g-max">Large Increase: .02</option>
+					<select id="gravity-change">
+						<option value="g-static">Static (no change)</option>
+						<option value="g-min">Small Increase: .01</option>
+						<option value="g-max">Large Increase: .02</option>
 					</select>
 				</li>
 				<li><input type="submit" class="submit" value="Save Changes" /></li>

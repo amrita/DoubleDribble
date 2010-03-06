@@ -106,12 +106,14 @@ function pageIsLoaded()
 	
 	
 	$("#settings form").submit(saveSettings);
-	$("#settings").bind("pageAnimationStart", loadSettings);
+	$("#settings").bind("pageAnimationStart", loadSettingsScreen);
 	
 }
 
 function gameScreenHasAppeared()
 {
+	//first load any preset settings
+	loadSettingsForGame();
 	
 	//get the x value for the top of the baseboard
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
@@ -148,37 +150,75 @@ function gameScreenHasAppeared()
 }
 
 /******* PREFERENCES CODE *******/
-function loadSettings() {
+function loadSettingsForGame() {
+	
+	// Gravity
+	if (localStorage.gravity != null) {
+		alert("loc grav: "+localStorage.gravity);
+		INIT_GRAVITY = parseFloat(localStorage.gravity);
+	}
+	
+	// Gravity Change
+	if (localStorage.gravityChange != null) {
+		setGravityChange(localStorage.gravityChange);
+	}
+	
+	// Sound
+	if (localStorage.sound != null) {
+		isSoundOn = localStorage.sound == "true";
+	}
+}
+
+function loadSettingsScreen() {
+	
+	// Gravity
 	if (localStorage.gravity == null) {
 		localStorage.gravity = INIT_GRAVITY;
 	}
-    $("#gravity").val(localStorage.gravity);
+    $("#gravity").val([localStorage.gravity]);
+	
+	// Gravity Change
+	if (localStorage.gravityChange == null) {
+		localStorage.gravityChange = "g-static";
+	}
+	$("#gravity-change").val([localStorage.gravityChange]);
 	
 	// Sound
 	if (localStorage.sound == null) {
-		alert("sound local storage null");
 		localStorage.sound = isSoundOn;
 	} else {
 		isSoundOn = localStorage.sound == "true";
 	}
 	if (isSoundOn) {
-	//alert("sound("+localStorage.sound+") val("+value+")");
 		$("#sound").val(["soundOn"]);
 	}
 }
 
 function saveSettings() {
-	//alert("Saving grav: "+ $("#gravity").val());
-	// Gravity
-	INIT_GRAVITY = parseFloat($("#gravity").val());
-    localStorage.gravity = INIT_GRAVITY;
-	
 	// Sound
 	isSoundOn = $("#sound").is(":checked");
 	localStorage.sound = isSoundOn;
 	
+	// Gravity
+	INIT_GRAVITY = parseFloat($("#gravity").val());
+    localStorage.gravity = INIT_GRAVITY;
+	
+	// Gravity
+	var gravChange = $("#gravity-change").val();
+	setGravityChange(gravChange);
+    localStorage.gravityChange = gravChange;
+	
     jQT.goBack();
     return false;
+}
+
+function setGravityChange(changeValue) {
+	switch (changeValue) {
+		case "g-static": GRAVITY_CHANGE = 0.0; break;
+		case "g-min": GRAVITY_CHANGE = 0.01; break;
+		case "g-max": GRAVITY_CHANGE = 0.02; break;
+		default: alert("default grav change??? shouldn't happen");
+	}
 }
 
 /******* ACCELEROMETER CODE *******/
@@ -297,6 +337,7 @@ function checkAnswer(X,Y,answer,ball){
 		clearDenominatorHint(olddenom);
 		
 		if (currentTry == 1) {
+			alert('adjusting grav by '+GRAVITY_CHANGE);
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
@@ -419,7 +460,7 @@ function addBall()
 
 function initializePositionForBall(ball)
 {
-	alert("Sound ball: "+isSoundOn);
+	//alert("Sound ball: "+isSoundOn);
 	
 	// We will position the ball above the top of the screen and at a random x position
 	var ballHeight = parseInt(ball.css("height"));
