@@ -617,8 +617,7 @@ function restartLevel(level) {
 	
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
-	alert("timerloop: "+timerLoop);
-
+	
 	gameIsOver = false;
 	
 	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()?
