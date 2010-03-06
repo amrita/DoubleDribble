@@ -10,6 +10,29 @@
 	text-align: center;
 }
 
+#home{
+  background-image: url('../images/splashmenublank.png');
+}
+
+#playmenu{
+  top:  280px;
+	left: 80px;
+	position: absolute;
+}
+
+#preferencesmenu{
+  top:  350px;
+	left: 80px;
+	position: absolute;
+}
+
+#aboutmenu{
+  background-image: url('../images/splashmenublank.png');
+  top:  420px;
+	left: 80px;
+	position: absolute;
+}
+
 #full-screen-area
 {
 	background-color: white;
