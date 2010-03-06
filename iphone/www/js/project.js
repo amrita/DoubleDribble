@@ -51,9 +51,6 @@ var isSoundOn = true;
 // whether the game is over
 var gameIsOver = true;
 
-//not needed remove later 
-var yDELTA = 1.0;
-
 // whether or not the player is playing the first problem in the game
 var firstProblemInTheGame;
 
@@ -249,20 +246,7 @@ function initBaseBoard(){
 	this.offset = 10;
 }
 
-/******* BUTTON CODE *******/
-function leftAxisClick() {
-	if (horizontalChange > 0.0) {
-		horizontalChange = 0.0;
-	}
-	horizontalChange -= yDELTA;	
-}
-
-function rightAxisClick() {
-	if (horizontalChange < 0.0) {
-		horizontalChange = 0.0;
-	}
-	horizontalChange += yDELTA;
-}
+/******* ANIMATION & MAIN GAME LOOP CODE *******/
 
 function animationLoop()
 {
