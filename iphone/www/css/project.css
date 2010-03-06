@@ -32,6 +32,10 @@
 	position: absolute;
 }
 
+#settings{
+  background-image: url('../images/splashmenublank.png');
+}
+
 #about{
   background-image: url('../images/splashmenublank.png');
 }
