@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 1; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
