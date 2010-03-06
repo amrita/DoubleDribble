@@ -41,8 +41,8 @@ var bboffset = 10;
 var bbcolors  = ['black','blue','green','purple'];
 var bbcolorid = 0;
 
-var error			 = 15; // error allowed in pixels. 
-var closeEnoughError = 30;
+var error			 = 7; // error allowed in pixels. 
+var closeEnoughError = 15;
 
 //accelerometer variables to make the object bounce
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
@@ -110,8 +110,12 @@ function pageIsLoaded()
 	
 }
 
-function gameScreenHasAppeared()
+function gameScreenHasAppeared(event, info)
 {
+	if (info.direction == 'out') {
+		return; // if we don't return, then we begin a whole new game when the user leaves the page.
+	}
+	
 	//first load any preset settings
 	loadSettingsForGame();
 	
@@ -154,7 +158,6 @@ function loadSettingsForGame() {
 	
 	// Gravity
 	if (localStorage.gravity != null) {
-		alert("loc grav: "+localStorage.gravity);
 		INIT_GRAVITY = parseFloat(localStorage.gravity);
 	}
 	
@@ -233,15 +236,10 @@ function startWatchingForShaking() {
 	var fail = function(){};
 	var options = {};
 	options.frequency = 100;
-	//alert("accelerometer loaded2: "+navigator.accelerometer);
-	//alert("accelerometer loaded2: "+navigator.accelerometer.watchAcceleration);
 	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
-	
-	//alert("accelerometer loaded3: "+watcher);
 }
 
 function accelerometerFired(coords) {
-	//alert("Coords: "+coords);
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
 	}
@@ -281,7 +279,6 @@ function animationLoop()
 		newTop = _yInitial;
 		_oldTime = _newTime;
 	}
-	//alert("top: "+newTop);
 	$(ball).css("top", newTop);
 	
 	// Move the ball left/right
@@ -312,13 +309,13 @@ function animationLoop()
 function checkAnswer(X,Y,answer,ball){
 	
 	//if the answer is correct then light up baseboard 
-	if ((Y >= (answer - error)) && (Y <= (answer + error))){
+	if ((Y > (answer - closeEnoughError)) && (Y < (answer + closeEnoughError))){
 		
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
 		
-		if (Y == answer){
+		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
 			bullseyeAnswer(answer);
 		}
@@ -337,7 +334,6 @@ function checkAnswer(X,Y,answer,ball){
 		clearDenominatorHint(olddenom);
 		
 		if (currentTry == 1) {
-			alert('adjusting grav by '+GRAVITY_CHANGE);
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
@@ -460,8 +456,6 @@ function addBall()
 
 function initializePositionForBall(ball)
 {
-	//alert("Sound ball: "+isSoundOn);
-	
 	// We will position the ball above the top of the screen and at a random x position
 	var ballHeight = parseInt(ball.css("height"));
 	var ballWidth = parseInt(ball.css("width"));
@@ -590,7 +584,6 @@ function clearAnswerBoard(answerY){
 
 
 function gameOver(){
-	//alert("Game Over !!");
 	$("#game-over").css("visibility", "visible");
 	$("#game-over").fadeIn("slow");
 	
@@ -624,6 +617,7 @@ function restartLevel(level) {
 	
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
+	alert("timerloop: "+timerLoop);
 
 	gameIsOver = false;
 	
@@ -743,9 +737,6 @@ function initializeGameSounds()
 // Calls the appropriate bullseye sound and graphic, adjusts the score, and pulls the next problem
 function bullseyeAnswer(answer)
 {
-	//lights up the baseboard to the correct value
-	displayAnswerBoard(answer);
-	
 	playBullseyeSound();
 	adjustScore('bullseye');
 	adjustProblemProbabilities('bullseye');
