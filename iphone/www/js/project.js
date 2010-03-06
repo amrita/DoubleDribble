@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 2; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -22,10 +22,8 @@ var usingSimulator = false;
 // Global ball array
 var ball;
 
-//Global click (x,y) position
-var clickX;
-var clickY;
-
+// ball values
+var ballHeight;
 var ballX;
 var ballY;
 
@@ -295,12 +293,12 @@ function animationLoop()
 	}
 	$(ball).css("left", newLeft);
 	
-	//set the current x,y co-ordinates of the object
-	setObjectXY(ball);
-	
 	//if the object has hit the baseboard check the answer
-	// TODO: use newTop + BALL_HEIGHT -> pre-calculated constant to make this calculation (faster)
-	if (ballX >= topBaseboard){
+	if (newTop + ballHeight >= topBaseboard){
+		
+		//set the current x,y co-ordinates of the object
+		setObjectXY(ball);
+		
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
 }
@@ -452,6 +450,8 @@ function addBall()
 	
 	// Set the ball's position using a "helper" function
 	initializePositionForBall(ball);
+	
+	ballHeight = parseInt(ball.css("height"));
 }
 
 function initializePositionForBall(ball)
