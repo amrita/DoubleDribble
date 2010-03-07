@@ -412,6 +412,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelBackgroundImage(num){
+	num = Math.min(num, 17); // prevents going past the levels we have
 	var newBg = "url('images/level" + num + "bg.png')";
    $("#level-screen").css("background-image",newBg);	
 }
@@ -633,7 +634,7 @@ function restartLevel(level) {
 	
 	gameIsOver = false;
 	
-	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()?
+	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()? Restart game
 }
 
 /********* INIT_GRAVITY CODE **********/
