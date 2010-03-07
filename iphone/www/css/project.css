@@ -10,6 +10,36 @@
 	text-align: center;
 }
 
+#home{
+  background-image: url('../images/splashmenublank.png');
+}
+
+#playmenu{
+  top:  280px;
+	left: 80px;
+	position: absolute;
+}
+
+#preferencesmenu{
+  top:  350px;
+	left: 80px;
+	position: absolute;
+}
+
+#aboutmenu{
+  top:  420px;
+	left: 80px;
+	position: absolute;
+}
+
+#settings{
+  background-image: url('../images/splashmenublank.png');
+}
+
+#about{
+  background-image: url('../images/splashmenublank.png');
+}
+
 #full-screen-area
 {
 	background-color: white;
@@ -177,12 +207,13 @@
 
 #game-start {
 	position: absolute;
-	top: 100px;
-	left: 90px;
-	width: 140px;
-	height: 120px;
+	top: 130px;
+	left: 70px;
+	width: 210px;
+	height: 40px;
 	border: 3px solid red;
 	background: #0DBEFF;
+	
 }
 
 #game-over {
@@ -193,6 +224,8 @@
 	height: 120px;
 	border: 3px solid red;
 	background: #0DBEFF;
+	
+	visibility: hidden;
 }
 
 #game-over-buttons {

@@ -8,16 +8,22 @@ var jQT = new $.jQTouch({
 
 //GLOBAL VARIABLES
 
+// The number of continuous answers needed to skunk a level
+var skunk = 5; 
+
+// Initial gravity for the app. For dynamic gravity changes use changeGravity()
+var INIT_GRAVITY = 0.15;
+// How much gravity is increased on success
+var GRAVITY_CHANGE = .001;
+
 // Set this to true if you're using the iPhone Simulator
 var usingSimulator = false;
 
 // Global ball array
 var ball;
 
-//Global click (x,y) position
-var clickX;
-var clickY;
-
+// ball values
+var ballHeight;
 var ballX;
 var ballY;
 
@@ -33,14 +39,11 @@ var bboffset = 10;
 var bbcolors  = ['black','blue','green','purple'];
 var bbcolorid = 0;
 
-var error			 = 15; // error allowed in pixels. 
-var closeEnoughError = 30;
+var error			 = 7; // error allowed in pixels. 
+var closeEnoughError = 15;
 
 //accelerometer variables to make the object bounce
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
-
-// Initial gravity for the app. For dynamic gravity changes use changeGravity()
-var INIT_GRAVITY = 0.15;
 
 // Used to turn sound on or off
 var isSoundOn = true;
@@ -70,7 +73,6 @@ var baseboardMax = 1; // Tracks the upper number on the baseboard
 var baseboardMaxPotential = 2; // The highest number the game will ever make the baseboardMax (used for generating fractions)
 
 var streakCounter = 0; // Tracks the number of continuous problems solved correctly 
-var skunk = 2; // The number of continuous answers needed to skunk a level
 
 var fractionProblems = new Array(); // Creating an Array to hold all the fraction problems
 var currentProblem;  // Tracks the current problem the player is working on
@@ -82,7 +84,6 @@ var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
-
 
 
 // Initialization method
@@ -103,12 +104,18 @@ function pageIsLoaded()
 	
 	
 	$("#settings form").submit(saveSettings);
-	$("#settings").bind("pageAnimationStart", loadSettings);
+	$("#settings").bind("pageAnimationStart", loadSettingsScreen);
 	
 }
 
-function gameScreenHasAppeared()
+function gameScreenHasAppeared(event, info)
 {
+	if (info.direction == 'out') {
+		return; // if we don't return, then we begin a whole new game when the user leaves the page.
+	}
+	
+	//first load any preset settings
+	loadSettingsForGame();
 	
 	//get the x value for the top of the baseboard
 	topBaseboard = parseInt($(".baseboardclass").css("margin-top"));
@@ -133,8 +140,7 @@ function gameScreenHasAppeared()
 	//check for accelerometer movement
 	startWatchingForShaking();
 	
-	// Show game start and remove game over
-	$("#game-over").fadeOut("fast");
+	// Show game start
 	$("#game-start").fadeOut("slow");
 	
 	// Set up gravity and initialize oldTime for ball movement
@@ -146,31 +152,74 @@ function gameScreenHasAppeared()
 }
 
 /******* PREFERENCES CODE *******/
-function loadSettings() {
+function loadSettingsForGame() {
+	
+	// Gravity
+	if (localStorage.gravity != null) {
+		INIT_GRAVITY = parseFloat(localStorage.gravity);
+	}
+	
+	// Gravity Change
+	if (localStorage.gravityChange != null) {
+		setGravityChange(localStorage.gravityChange);
+	}
+	
+	// Sound
+	if (localStorage.sound != null) {
+		isSoundOn = localStorage.sound == "true";
+	}
+}
+
+function loadSettingsScreen() {
+	
+	// Gravity
 	if (localStorage.gravity == null) {
 		localStorage.gravity = INIT_GRAVITY;
 	}
+    $("#gravity").val([localStorage.gravity]);
+	
+	// Gravity Change
+	if (localStorage.gravityChange == null) {
+		localStorage.gravityChange = "g-static";
+	}
+	$("#gravity-change").val([localStorage.gravityChange]);
+	
+	// Sound
 	if (localStorage.sound == null) {
 		localStorage.sound = isSoundOn;
 	} else {
-		isSoundOn = localStorage.sound;
+		isSoundOn = localStorage.sound == "true";
 	}
-    $("#gravity").val(localStorage.gravity);
-    $("#sound").val(localStorage.sound);
+	if (isSoundOn) {
+		$("#sound").val(["soundOn"]);
+	}
 }
 
 function saveSettings() {
-	//alert("Saving grav: "+ $("#gravity").val());
+	// Sound
+	isSoundOn = $("#sound").is(":checked");
+	localStorage.sound = isSoundOn;
+	
 	// Gravity
 	INIT_GRAVITY = parseFloat($("#gravity").val());
     localStorage.gravity = INIT_GRAVITY;
 	
-	// Sound
-	isSoundOn = $("#sound").is(":checked");
-	//alert("sound: "+isSoundOn);
+	// Gravity
+	var gravChange = $("#gravity-change").val();
+	setGravityChange(gravChange);
+    localStorage.gravityChange = gravChange;
 	
     jQT.goBack();
     return false;
+}
+
+function setGravityChange(changeValue) {
+	switch (changeValue) {
+		case "g-static": GRAVITY_CHANGE = 0.0; break;
+		case "g-min": GRAVITY_CHANGE = 0.01; break;
+		case "g-max": GRAVITY_CHANGE = 0.02; break;
+		default: alert("default grav change??? shouldn't happen");
+	}
 }
 
 /******* ACCELEROMETER CODE *******/
@@ -185,15 +234,10 @@ function startWatchingForShaking() {
 	var fail = function(){};
 	var options = {};
 	options.frequency = 100;
-	//alert("accelerometer loaded2: "+navigator.accelerometer);
-	//alert("accelerometer loaded2: "+navigator.accelerometer.watchAcceleration);
 	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
-	
-	//alert("accelerometer loaded3: "+watcher);
 }
 
 function accelerometerFired(coords) {
-	//alert("Coords: "+coords);
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
 	}
@@ -233,7 +277,6 @@ function animationLoop()
 		newTop = _yInitial;
 		_oldTime = _newTime;
 	}
-	//alert("top: "+newTop);
 	$(ball).css("top", newTop);
 	
 	// Move the ball left/right
@@ -250,12 +293,12 @@ function animationLoop()
 	}
 	$(ball).css("left", newLeft);
 	
-	//set the current x,y co-ordinates of the object
-	setObjectXY(ball);
-	
 	//if the object has hit the baseboard check the answer
-	// TODO: use newTop + BALL_HEIGHT -> pre-calculated constant to make this calculation (faster)
-	if (ballX >= topBaseboard){
+	if (newTop + ballHeight >= topBaseboard){
+		
+		//set the current x,y co-ordinates of the object
+		setObjectXY(ball);
+		
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
 }
@@ -264,13 +307,13 @@ function animationLoop()
 function checkAnswer(X,Y,answer,ball){
 	
 	//if the answer is correct then light up baseboard 
-	if ((Y >= (answer - error)) && (Y <= (answer + error))){
+	if ((Y > (answer - closeEnoughError)) && (Y < (answer + closeEnoughError))){
 		
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
 		
-		if (Y == answer){
+		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
 			bullseyeAnswer(answer);
 		}
@@ -287,6 +330,11 @@ function checkAnswer(X,Y,answer,ball){
 		clearArrowHint();
 		//clear the number line hints
 		clearDenominatorHint(olddenom);
+		
+		if (currentTry == 1) {
+			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
+		}
+		
 		//reset current try to 1
 		currentTry = 1;
 		
@@ -402,6 +450,8 @@ function addBall()
 	
 	// Set the ball's position using a "helper" function
 	initializePositionForBall(ball);
+	
+	ballHeight = parseInt(ball.css("height"));
 }
 
 function initializePositionForBall(ball)
@@ -463,6 +513,7 @@ function clearArrowHint(){
 	
 }
 
+
 // show either the left or the right hint arrow based on the position
 // of the ball as opposed to the correct answer 
 function showDenominatorHint(X,Y,answer){
@@ -470,16 +521,17 @@ function showDenominatorHint(X,Y,answer){
 	var decimalvalue;
 	var answer;
 	
-	denom = currentProblem.denominator;
+	var denom = currentProblem.denominator;
+	var numer = currentProblem.numerator;
 	
-	//compute points on the number line based on the denominator
-	for (i = 1; i <= denom; i++){
-		
-		//compute the decimal value of the point
+	//compute points on the number line
+	i = 1;
+	while ( (i / denom) < baseboardMax){
+	  //compute the decimal value of the point
 	  decimalvalue	= i / denom; 
 		
 		//compute the pixel where it should be on the baseboard 
-		answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
+	  answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
 		
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
@@ -489,13 +541,24 @@ function showDenominatorHint(X,Y,answer){
 		
 		//move the hint to the correct place on the number line
 		pHint.css("margin-left",answer);
-
-	}
+		
+		//if the value of decimal value of this hint is 1, change its color to orange
+		if (decimalvalue == 1){
+		  pHint.css("background-color","#ff7200");	
+		}
+		
+		//inc i
+		i++;
+		
+	} //while ends 
 }
 
 function clearDenominatorHint(denom){
-  for (i = 1; i <= denom; i++){
+  //for (i = 1; i <= denom; i++){
+	var i = 1;
+  while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
+		i++;
 	}
 }
 
@@ -534,8 +597,9 @@ function clearAnswerBoard(answerY){
 
 
 function gameOver(){
-	//alert("Game Over !!");
-	$("#game-over").fadeIn('fast');
+	$("#game-over").css("visibility", "visible");
+	$("#game-over").fadeIn("slow");
+	
 	gameIsOver = true;
 }
 
@@ -566,7 +630,7 @@ function restartLevel(level) {
 	
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
-
+	
 	gameIsOver = false;
 	
 	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()?
@@ -588,6 +652,10 @@ function changeGravity(newGravity) {
 	_gravity = newGravity / 1000.0;
 	var time = Math.sqrt( 2.0 *  _ballBounceHeight / _gravity ); 
 	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
+}
+
+function getAdjustedGravity() {
+	return _gravity * 1000.0;
 }
 
 /**
@@ -615,9 +683,6 @@ function getTopForTime() {
 }
 
 /********* LEVEL CODE **********/
-
-
-
 
 // Creating the problemObject 
 function problemObject()
@@ -684,9 +749,6 @@ function initializeGameSounds()
 // Calls the appropriate bullseye sound and graphic, adjusts the score, and pulls the next problem
 function bullseyeAnswer(answer)
 {
-	//lights up the baseboard to the correct value
-	displayAnswerBoard(answer);
-	
 	playBullseyeSound();
 	adjustScore('bullseye');
 	adjustProblemProbabilities('bullseye');
@@ -719,8 +781,8 @@ function displayBullseyeGraphic()
 function playBullseyeSound()
 {
 	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
-	bullseyeSounds[0].play();  // Exposion sound
-	bullseyeSounds[random].play();  // + random sound = delicious
+	playSoundIfSoundIsOn(bullseyeSounds[0]);  // Exposion sound
+	playSoundIfSoundIsOn(bullseyeSounds[random]);  // + random sound = delicious
 }
 
 /********* SOUND CODE **********/
@@ -745,7 +807,7 @@ function displayCloseEnoughGraphic()
 function playCloseEnoughSound()
 {
 	var random = getRandomInteger(0,Math.min((closeEnoughSounds.length - 1), (currentLevel - 1)));
-	closeEnoughSounds[random].play();
+	playSoundIfSoundIsOn(closeEnoughSounds[random]);
 }
 
 // Plays a random sound from the nextLevel Array
@@ -807,6 +869,7 @@ function bonusGraphic()
 
 // Controls the sequences of levels
 function nextLevel() {
+	changeGravity(INIT_GRAVITY);	// Reset the gravity after each level
 	setLevel(currentLevel + 1);
 	playNextLevelSound();
 }
