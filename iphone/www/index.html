@@ -45,7 +45,7 @@
 		  <div id="level-screen">
 			  <div id="score-div" class="axis-button" >Score: <div id="score" class="game-value">0</div></div>
 			  <div id="level-div" class="axis-button" >Level: <div id="level" class="game-value">1</div></div>
-			  <div id="ball" class="ballClass">
+			  <div id="ball" class="ballClass" onClick="tempGravityChange();">
 				  <div id="numerator" class="fraction-text">_</div>
 				  <div id="denominator" class="fraction-text">_</div>
 			  </div>
@@ -84,7 +84,7 @@
 		<form method="post">
 			<ul>
 				<li>Sound <span class="toggle"><input type="checkbox" name="sound" id="sound" value="soundOn" /></span></li>
-				<li><span>Gravity </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
+				<li><span>Gravity </span><input type="text" name="gravity" id="gravity" /></li>
 				<li>Right Answer Gravity Change
 					<select id="gravity-change">
 						<option value="g-static">Static (no change)</option>

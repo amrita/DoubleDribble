@@ -17,7 +17,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = false;
+var usingSimulator = true;
 
 // Global ball array
 var ball;
@@ -142,7 +142,7 @@ function gameScreenHasAppeared(event, info)
 	
 	// Set up gravity and initialize oldTime for ball movement
 	changeGravity(INIT_GRAVITY);
-	_oldTime = new Date().getTime();
+	setBallAtHeight(260.0, true);
 	
 	// Reset game state
 	restartGame();
@@ -511,11 +511,11 @@ function showDenominatorHint(X,Y,answer){
 	//compute points on the number line
 	i = 1;
 	while ( (i / denom) < baseboardMax){
-	  //compute the decimal value of the point
-	  decimalvalue	= i / denom; 
+		//compute the decimal value of the point
+		decimalvalue = i / denom; 
 		
 		//compute the pixel where it should be on the baseboard 
-	  answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
+		answer       = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
 		
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
@@ -625,21 +625,73 @@ function restartLevel(level) {
 /**
  * Improved gravity
  *                     1   2
- *           y = v  +  - gt
+ *           y = v t + - gt
  *                ˚    2
  */
 var _gravity;
 var _ballBounceHeight = 330.0;
 var _yInitial = 360.0; // TODO: tie this to location of baseboard
-var _roundtripTime = 2500;
 function changeGravity(newGravity) {
 	_gravity = newGravity / 1000.0;
-	var time = Math.sqrt( 2.0 *  _ballBounceHeight / _gravity ); 
+	var time = getGravityTime();
 	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
+}
+
+// This is the time to go from the bottom to the top of the screen
+function getGravityTime() {
+	return Math.sqrt( 2.0 *  _ballBounceHeight / _gravity );
 }
 
 function getAdjustedGravity() {
 	return _gravity * 1000.0;
+}
+
+/**
+ * Change gravity at a point      _____
+ *                               / g   
+ *                    t  = t    /   1
+ *                     2    1  /  ---
+ *                            /    g
+ *                           √      2
+ */
+function changeGravityAtPoint(newGravity) {
+	var currTime = new Date().getTime();
+	var newTime = (currTime - _oldTime) * Math.sqrt(getAdjustedGravity() / newGravity);
+	
+	changeGravity(newGravity);
+	_oldTime = currTime - newTime;
+	
+}
+
+function tempGravityChange() {
+	var oldGravity = getAdjustedGravity();
+	
+	changeGravityAtPoint(.007);
+	setTimeout("resetGravity("+oldGravity+")", 2000);
+}
+
+function resetGravity(gravity) {
+	changeGravityAtPoint(parseFloat(gravity));
+}
+
+// If falling is true, then this calculates the position of the ball at the given height with the ball dropping.
+function setBallAtHeight(height, falling) {
+	// alert("setBallAtHeight");
+	var distance;
+	var time;
+	
+	if (falling) {
+		distance = height - (_yInitial - _ballBounceHeight);
+		time = Math.sqrt(2 * distance / _gravity); // calculate
+		time += getGravityTime(); // add the time to get to the top of the screen
+		time *= -1.0; // make this value negative for the _oldTime calculation below
+		
+	} else {
+		distance = _yInitial - height;
+		time = (_initialVelocity + Math.sqrt(_initialVelocity * _initialVelocity - 2*_gravity*distance)) / _gravity;
+	}
+	
+	_oldTime = new Date().getTime() + time;
 }
 
 /**
@@ -656,8 +708,8 @@ function getTopForTime() {
 	_newTime = new Date().getTime();
 	
 	var newTop;
-	if (_newTime == _oldTime) {
-		newTop = _xInitial;
+	if (_newTime <= _oldTime) {
+		newTop = _yInitial;
 	} else {
 		var timeDelta = _newTime - _oldTime;
 		newTop = _yInitial + timeDelta * ( _initialVelocity + _gravity * timeDelta / 2.0 );
