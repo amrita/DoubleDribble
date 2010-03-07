@@ -11,7 +11,7 @@
 }
 
 #home{
-  background-image: url('../images/splashmenublank.png');
+  background-image: url('../images/splashmenuwdirections.png');
 }
 
 #playmenu{
@@ -26,6 +26,12 @@
 	position: absolute;
 }
 
+#howtoplaymenu{
+    top:  385px;
+	left: 97px;
+	position: absolute;
+}
+
 #aboutmenu{
   top:  420px;
 	left: 80px;
@@ -33,6 +39,10 @@
 }
 
 #settings{
+  background-image: url('../images/splashmenublank.png');
+}
+
+#how-to-play{
   background-image: url('../images/splashmenublank.png');
 }
 

@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 1; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -396,6 +396,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelBackgroundImage(num){
+	num = Math.min(num, 17); // prevents going past the levels we have
 	var newBg = "url('images/level" + num + "bg.png')";
    $("#level-screen").css("background-image",newBg);	
 }
@@ -617,7 +618,7 @@ function restartLevel(level) {
 	
 	gameIsOver = false;
 	
-	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()?
+	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()? Restart game
 }
 
 /********* INIT_GRAVITY CODE **********/
@@ -942,11 +943,11 @@ function changeLevelType(levelType)
 	//changes the background of the ball
 	switch(levelType){
 		case 'multiplication':
-			var newBg = "url('../images/plainball.png')";
+			var newBg = "url('images/plainball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
 		case 'sqroot':
-			var newBg = "url('../images/sqrootball.png')";
+			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
 	}
