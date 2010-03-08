@@ -19,8 +19,10 @@ var GRAVITY_CHANGE = .001;
 // Set this to true if you're using the iPhone Simulator
 var usingSimulator = false;
 
-// Global ball array
+// The ball in the game
 var ball;
+var ballInitialTop = 260.0;
+var ballInitialLeft = 280.0;
 
 // ball values
 var ballHeight;
@@ -88,13 +90,17 @@ var nextLevelSounds = new Array();
 // Dunking
 var dunkGForce = 1.5;
 var accelerometerFrequency = 60;
+var isDunking = false;
+var dunkWait = false;
+var preDunkGravity;
+var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
 // Initialization method
 $(function() {
   
   // A small patch to fix the background height of jQTouch pages under PhoneGap
   if (typeof(PhoneGap) != 'undefined') {
-    $("body > *").css("minHeight", "460px !important");
+    $("body > *").css("minHeight", "480px !important");
   }	
   
 	document.addEventListener("touchmove",function(e){e.preventDefault();},false); //prevent scrolling 
@@ -144,19 +150,6 @@ function gameScreenHasAppeared(event, info)
 	
 	// Add ball to screen after game messages are done
 	setTimeout('addBall();', 4000);
-	
-	//check for accelerometer movement
-	startWatchingForShaking();
-	
-	// Show game start
-	$("#game-start").fadeOut("slow");
-	
-	// Set up gravity and initialize oldTime for ball movement
-	changeGravity(INIT_GRAVITY);
-	setBallAtHeight(260.0, true);
-	
-	// Reset game state
-	restartGame();
 }
 
 /******* PREFERENCES CODE *******/
@@ -255,11 +248,13 @@ var highestZ = 0.0;
 function accelerometerFired(coords) {
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
-	} else if (dunkGForce < Math.abs(coords.z)) {
+	} else if (dunkGForce < Math.abs(coords.z) && !isDunking && !dunkWait) {
 		if (Math.abs(coords.z) > highestZ) {
 			highestZ = coords.z;
 		}
-		alert("Dunk!!!\ncoords.z: "+coords.z+" highest: "+highestZ);
+		_gravity *= dunkGravityChange;
+		isDunking = true;
+		dunkWait = true;
 	}
 	horizontalChange += coords.x * 4.0;
 }
@@ -285,6 +280,13 @@ function animationLoop()
 	if (newTop >= _yInitial) {
 		newTop = _yInitial;
 		_oldTime = _newTime;
+		
+		if (isDunking) {
+			isDunking = false;
+			changeGravity(INIT_GRAVITY); // NOTE: if you are changing gravity for correct answers, this
+										 // will reset the delta
+			setTimeout("dunkWait = false;", 500);
+		}
 	}
 	
 	$(ball).css("top", newTop);
@@ -470,27 +472,24 @@ function addBall()
 
 function initializePositionForBall(ball)
 {
-	// We will position the ball above the top of the screen and at a random x position
-	var ballHeight = parseInt(ball.css("height"));
-	var ballWidth = parseInt(ball.css("width"));
-	var screenWidth = parseInt($("#game-screen").css("width"));
-	
-	// Start the ball just above the top of the screen
-//	var newBallTop = 10;
-	var newBallTop = 40;   // placing ball right next to the opening message
-	
-	// Make sure the ball doesn't hang off the right side of the screen
-	var maxLeft = screenWidth - ballWidth;
-//	var newBallLeft = Math.floor(Math.random() * maxLeft);
-	var newBallLeft = 200  // placing ball right next to the opening message
-	
 	// Finally, update the ball's position
-	ball.css("top", newBallTop);
+	ball.css("top", ballInitialTop);
 	if (usingSimulator) {
-		ball.css("left", "150px");
+		ball.css("left", "145px");
 	} else {
-		ball.css("left", newBallLeft);
+		ball.css("left", ballInitialLeft);
 	}
+	
+	//check for accelerometer movement
+	startWatchingForShaking();
+	
+	// Set up gravity and initialize oldTime for ball movement
+	changeGravity(INIT_GRAVITY);
+	setBallAtHeight(ballInitialTop, true);
+	tempGravityChange(.007);
+	
+	// Reset game state
+	restartGame();
 }
 
 function initialGameMessages()
@@ -761,18 +760,24 @@ function changeGravityAtPoint(newGravity) {
 	
 }
 
-function tempGravityChange() {
+function tempGravityChange(tempGravity) {
 	var oldGravity = getAdjustedGravity();
 	
-	changeGravityAtPoint(.007);
-	setTimeout("resetGravity("+oldGravity+")", 2000);
+	changeGravityAtPoint(tempGravity);
+	setTimeout("resetGravity("+oldGravity+")", 1000);
 }
 
 function resetGravity(gravity) {
 	changeGravityAtPoint(parseFloat(gravity));
 }
 
-// If falling is true, then this calculates the position of the ball at the given height with the ball dropping.
+/**
+ * If falling is true, then this calculates the position of the ball at the given height with the ball dropping.
+ * This is opposed to false where the ball is calculated on the way up.
+ *
+ * 
+ * 
+ */
 function setBallAtHeight(height, falling) {
 	// alert("setBallAtHeight");
 	var distance;

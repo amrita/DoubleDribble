@@ -211,17 +211,6 @@
 	font-size: 12pt;
 }
 
-#game-start {
-	position: absolute;
-	top: 130px;
-	left: 70px;
-	width: 210px;
-	height: 40px;
-	border: 3px solid red;
-	background: #0DBEFF;
-	color: white;
-}
-
 #game-messageboard{
 	position: absolute;
 	top:250px;
