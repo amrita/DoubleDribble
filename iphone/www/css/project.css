@@ -222,6 +222,15 @@
 	color: white;
 }
 
+#pause-indicator {
+	position: absolute;
+	top:140px;
+	left:0px;
+	
+	width: 320px;
+	height: 60px;
+}
+
 #game-messageboard{
 	position: absolute;
 	top:250px;

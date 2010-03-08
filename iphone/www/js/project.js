@@ -6,10 +6,11 @@ var jQT = new $.jQTouch({
 	statusBar: 'default'
 });
 
+
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 2; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -39,7 +40,7 @@ var bboffset = 10;
 var bbcolors  = ['black','blue','green','purple'];
 var bbcolorid = 0;
 
-var error			 = 7; // error allowed in pixels. 
+var error			 = 4; // error allowed in pixels. 
 var closeEnoughError = 15;
 
 //accelerometer variables to make the object bounce
@@ -86,7 +87,7 @@ var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
 // Dunking
-var dunkGForce = 1.05;
+var dunkGForce = 4.05;   // set to 4 to eliminate dunking
 var accelerometerFrequency = 60;
 
 // Initialization method
@@ -94,7 +95,7 @@ $(function() {
   
   // A small patch to fix the background height of jQTouch pages under PhoneGap
   if (typeof(PhoneGap) != 'undefined') {
-    $("body > *").css("minHeight", "460px !important");
+    $("body > *").css("minHeight", "480px !important");
   }	
   
 	document.addEventListener("touchmove",function(e){e.preventDefault();},false); //prevent scrolling 
@@ -380,7 +381,6 @@ function checkAnswer(X,Y,answer,ball){
 				currentTry = 1;
 				clearInterval(timerLoop);	
 				clearArrowHint();
-				clearDenominatorHint();
 				displayAnswerBoardDeadOn(answerY);
 				gameOver();	
 				break;
@@ -553,7 +553,7 @@ function showArrowHint(X,Y,answer){
 
 function clearArrowHint(){
 	$("#blackarrowright").css("margin-left",0);	
-  $("#blackarrowright").css("visibility","hidden");	
+    $("#blackarrowright").css("visibility","hidden");	
 	$("#blackarrowright").css("margin-right",0);
 	$("#blackarrowleft").css("visibility","hidden");	
 	
@@ -654,20 +654,35 @@ function pauseGame(){
 	// if the game isn't paused then pause it
 	if (!gamePaused){
 		gamePaused = true;
-    clearInterval(timerLoop);		
+		
+		// Shows pause indicator
+		var pauseMessage = "url('images/pause.png')";
+		$("#pause-indicator").css("background-image", pauseMessage);
+		
+		clearInterval(timerLoop);	
 	}
 	//else restart with a new problem
 	else{
 		//set pause to false
 		gamePaused = false;
+		
+		// erases any baseboard hints
+		clearArrowHint();
+		clearDenominatorHint(currentProblem.denominator);		
+		
 		//get the next problem
-	  nextProblem();
+		nextProblem();
 		//compute the answer for this problem
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		//set current try to 0 since we are changing the problem here
 		currentTry = 0;
-		//start at the current level
-		restartLevel(currentLevel);
+		
+		// erases pause indicator
+		var pauseMessage = "url('images/.png')";
+		$("#pause-indicator").css("background-image", pauseMessage);
+				
+		//restarts animation
+		timerLoop = setInterval("animationLoop()", 50);
 	}
 }
 
@@ -1187,12 +1202,14 @@ function getNewProblem()
 {
 	switch(currentLevelType){
 		case 'fraction':
+			var oldNumer = currentProblem.numerator;
+			var oldDenom = currentProblem.denominator;
 			do{	
 				var randomFloat = Math.random();
 				var denom = getRandomInteger(2,highestDenominator[currentLevel]);
 				var numer = getRandomInteger(0,(denom * baseboardMax));
-			} while(randomFloat > fractionProblems[denom][numer].probability);   
-			// exits the do loop once it has found a problem probability higher than the randomFloat
+			} while(randomFloat > fractionProblems[denom][numer].probability || ((denom == oldDenom) && (numer == oldNumer)));   
+			// exits the do loop once it has found a problem probability higher than the randomFloat, and ensures new problem is not identical
 			currentProblem = fractionProblems[denom][numer];
 			break;
 		case 'multiplication':
