@@ -17,7 +17,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = true;
+var usingSimulator = false;
 
 // Global ball array
 var ball;
@@ -82,6 +82,9 @@ var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
+// Dunking
+var dunkGForce = 1.05;
+var accelerometerFrequency = 60;
 
 // Initialization method
 $(function() {
@@ -220,6 +223,7 @@ function setGravityChange(changeValue) {
 }
 
 /******* ACCELEROMETER CODE *******/
+var accelerometerStarted = false;
 function startWatchingForShaking() {
 	if (usingSimulator) {
 		return;
@@ -230,16 +234,29 @@ function startWatchingForShaking() {
 	};
 	var fail = function(){};
 	var options = {};
-	options.frequency = 100;
-	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
+	options.frequency = accelerometerFrequency;
+	
+	// This is so we don't start multiple accelerometer callbacks
+	if (!accelerometerStarted) {
+		navigator.accelerometer.watchAcceleration(win, fail, options);
+		accelerometerStarted = true;
+	}
 }
 
+var highestZ = 0.0;
 function accelerometerFired(coords) {
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
+	} else if (dunkGForce < Math.abs(coords.z)) {
+		if (Math.abs(coords.z) > highestZ) {
+			highestZ = coords.z;
+		}
+		alert("Dunk!!!\ncoords.z: "+coords.z+" highest: "+highestZ);
 	}
 	horizontalChange += coords.x * 4.0;
 }
+
+
 
 //initialize baseboard settings
 function initBaseBoard(){
@@ -257,10 +274,11 @@ function animationLoop()
 	
 	// Move the ball up/down	
 	var newTop = getTopForTime();
-	if (newTop > _yInitial) {
+	if (newTop >= _yInitial) {
 		newTop = _yInitial;
 		_oldTime = _newTime;
 	}
+	
 	$(ball).css("top", newTop);
 	
 	// Move the ball left/right
