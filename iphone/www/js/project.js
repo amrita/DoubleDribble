@@ -17,7 +17,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = true;
+var usingSimulator = false;
 
 // Global ball array
 var ball;
@@ -44,6 +44,9 @@ var closeEnoughError = 15;
 
 //accelerometer variables to make the object bounce
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
+
+//game paused or not
+var gamePaused = false;
 
 // Used to turn sound on or off
 var isSoundOn = true;
@@ -91,6 +94,8 @@ $(function() {
     $("body > *").css("minHeight", "460px !important");
   }	
   
+	document.addEventListener("touchmove",function(e){e.preventDefault();},false); //prevent scrolling 
+	
   $(document).ready(pageIsLoaded);
 });
 
@@ -472,6 +477,11 @@ function showArrowHint(X,Y,answer){
 		var width   = parseInt($("#blackarrowleft").css("width"));
 		var newLeft = left + (Y - left) - width;
 		
+		//does the arrow go past the answer ?
+		if ((newLeft - width) < answer){
+			newLeft = newLeft + width;
+		}
+		
 	  //set the new left value for the arrow 
 		$("#blackarrowleft").css("margin-left",newLeft);			
 		$("#blackarrowleft").css("visibility","visible");	
@@ -480,7 +490,13 @@ function showArrowHint(X,Y,answer){
 	//if the answer is greater than the current location, show the right arrow
 	else{
 		var left    = parseInt($("#blackarrowright").css("margin-left"));
+		var width   = parseInt($("#blackarrowright").css("width"));
 		var newLeft = left + (Y - left);
+		
+		//does the arrow go past the answer ?
+		if ((newLeft + width) > answer){
+			newLeft = newLeft - width;
+		}
 		
 		//set the new left value for the arrow 
 		$("#blackarrowright").css("margin-left",newLeft);			
@@ -563,8 +579,13 @@ function displayAnswerBoardClose(answerY){
 
 // if the correct answer was selected then light up the board 
 function displayAnswerBoardDeadOn(answerY){
+	
 	//set the newWidth to where the correct answer point is
 	var newWidth = answerY - bboffset;
+	
+	//special case for when the answer is 0. Set pixel width to 1 to display
+  //the answer. 
+	if (newWidth == 0) newWidth = 1;
 	
 	$("#answerboard").css("background-color","red");
 	$("#answerboard").css("width",newWidth);
@@ -580,6 +601,37 @@ function clearAnswerBoard(answerY){
 	$("#answerboard").fadeOut('slow');
 }
 
+
+//When the screen is tapped the first time pause the game
+//When its tapped again unpause and move to a new problem
+function pauseGame(){
+	
+	// if the game isn't paused then pause it
+	if (!gamePaused){
+		gamePaused = true;
+    clearInterval(timerLoop);		
+	}
+	//else restart with a new problem
+	else{
+		//set pause to false
+		gamePaused = false;
+		//get the next problem
+	  nextProblem();
+		//compute the answer for this problem
+		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
+		//set current try to 0 since we are changing the problem here
+		currentTry = 0;
+		//start at the current level
+		restartLevel(currentLevel);
+	}
+}
+
+function startGame(){
+	//pick a new problem
+	
+	//start the animation loop again
+	
+}
 
 function gameOver(){
 	$("#game-over").css("visibility", "visible");
