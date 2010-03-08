@@ -86,7 +86,7 @@ var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
 // Dunking
-var dunkGForce = 1.05;
+var dunkGForce = 1.5;
 var accelerometerFrequency = 60;
 
 // Initialization method
