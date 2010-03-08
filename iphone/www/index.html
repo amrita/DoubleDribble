@@ -23,10 +23,10 @@
 	<!-- Home screen -->
 	<div id="home">
 		
-		<div id="playmenu" onclick="jQT.goTo('#game-screen')"><img src="images/playmenu.png" alt="Play"/></div>
-		<div id="preferencesmenu" onclick="jQT.goTo('#settings')""><img src="images/preferencesmenu.png" alt="Preferences"/></div>
-		<div id="howtoplaymenu" onclick="jQT.goTo('#how-to-play')""><img src="images/howtoplaymenu.png" alt="How to Play"/></div>
-		<div id="aboutmenu" onclick="jQT.goTo('#about')"><img src="images/aboutmenu.png" alt="About"/></div>
+		<div id="playmenu" onclick="jQT.goTo('#game-screen', 'cube')"><img src="images/playmenu.png" alt="Play"/></div>
+		<div id="preferencesmenu" onclick="jQT.goTo('#settings', 'cube')"><img src="images/preferencesmenu.png" alt="Preferences"/></div>
+		<div id="howtoplaymenu" onclick="jQT.goTo('#how-to-play', 'cube')"><img src="images/howtoplaymenu.png" alt="How to Play"/></div>
+		<div id="aboutmenu" onclick="jQT.goTo('#about', 'cube')"><img src="images/aboutmenu.png" alt="About"/></div>
 		
 		
 		<!-- <div class="toolbar">
@@ -44,11 +44,10 @@
 	<div id="game-screen">
 		<div id="full-screen-area">
 		  <div id="level-screen">
-			  <div id="score-div" class="axis-button" >Score: <div id="score" class="game-value">0</div></div>
-			  <div id="level-div" class="axis-button" >Level: <div id="level" class="game-value">1</div></div>
+			  <div id="score">0 pts</div>
 			  <div id="ball" class="ballClass">
-				  <div id="numerator" class="fraction-text">_</div>
-				  <div id="denominator" class="fraction-text">_</div>
+				  <div id="numerator" class="fraction-text"></div>
+				  <div id="denominator" class="fraction-text"></div>
 			  </div>
 			  <div id="game-over">
 				<h2>Game Over</h2>
@@ -58,7 +57,8 @@
 					<input type="button" value="Home Screen" onclick="goHome();" />
 				</div>
 			  </div>
-			  <div id="game-start">Where is 1/2 on the number line?</div>
+			  <div id="game-start"></div>
+			  <div id="game-messageboard"></div>
 			</div>
 			<div id="baseboard" class="baseboardclass">
 			</div>
@@ -98,6 +98,7 @@
 		</form>
 	</div>
 	
+	<!-- How to Play screen -->	
 	<div id="how-to-play">
 	  <div class="toolbar">
 			<h1>How to Play</h1>
@@ -105,11 +106,10 @@
 		</div>
 	</div>
 	
+	
+	<!-- About screen -->	
 	<div id="about">
-	  <div class="toolbar">
-			<h1>About</h1>
-			<a class="button back" href="#">Back</a>
-		</div>
+		<div id="aboutback" onclick="jQT.goTo('#home', 'cube')"><img src="images/aboutback.png" alt="Back"/></div>
 	</div>
 	
 </body>

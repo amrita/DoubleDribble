@@ -9,7 +9,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 5; 
+var skunk = 2; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -134,8 +134,11 @@ function gameScreenHasAppeared(event, info)
 	// Initialize Game sounds
 	initializeGameSounds();
 	
-	// Add ball to screen
-	addBall();
+	// Run through initial game messages
+	initialGameMessages();
+	
+	// Add ball to screen after game messages are done
+	setTimeout('addBall();', 4000);
 	
 	//check for accelerometer movement
 	startWatchingForShaking();
@@ -441,11 +444,14 @@ function computeBoardLocation(problemId,bMin,bMax){
 
 function addBall()
 {
-	
 	computeBaseboardAnswer(currentProblem.decimalEquivalent,baseboardMin,baseboardMax);
 	
 	displayCurrentProblem();
 	
+	// Make the ball's background visible
+	var newBg = "url('images/fractionball.png')";
+	$(".ballClass").css("background-image", newBg);
+
 	// Now, we need to grab a reference to the ball we just added to the HTML
 	ball = $("#ball");
 	
@@ -463,11 +469,13 @@ function initializePositionForBall(ball)
 	var screenWidth = parseInt($("#game-screen").css("width"));
 	
 	// Start the ball just above the top of the screen
-	var newBallTop = 10;
+//	var newBallTop = 10;
+	var newBallTop = 40;   // placing ball right next to the opening message
 	
 	// Make sure the ball doesn't hang off the right side of the screen
 	var maxLeft = screenWidth - ballWidth;
-	var newBallLeft = Math.floor(Math.random() * maxLeft);
+//	var newBallLeft = Math.floor(Math.random() * maxLeft);
+	var newBallLeft = 200  // placing ball right next to the opening message
 	
 	// Finally, update the ball's position
 	ball.css("top", newBallTop);
@@ -476,6 +484,25 @@ function initializePositionForBall(ball)
 	} else {
 		ball.css("left", newBallLeft);
 	}
+}
+
+function initialGameMessages()
+{
+	// set first game message
+	changeGameMessage("messageboard");
+	
+	// after three seconds, change to second game message
+	setTimeout('changeGameMessage("messageboardwball");', 2000);
+
+	// then make game-message invisible
+	setTimeout('changeGameMessage("");', 4000)	
+}
+
+
+function changeGameMessage(imageName)
+{
+	var newMessage = "url('images/" + imageName + ".png')";
+	$("#game-messageboard").css("background-image",newMessage);
 }
 
 // show either the left or the right hint arrow based on the position
@@ -594,7 +621,7 @@ function displayAnswerBoardDeadOn(answerY){
 // clear the answer board
 function clearAnswerBoard(answerY){
 	$("#answerboard").fadeOut('slow');
-}
+}5
 
 
 function gameOver(){
@@ -860,7 +887,8 @@ function increaseScore(increase)
 
 function setScore(score) {
 	playerScore = score;
-	$("#score").text(playerScore);
+	var newScoreText = playerScore + " pts";
+	$("#score").text(newScoreText);
 }
 
 function bonusGraphic()
@@ -896,6 +924,14 @@ function setLevel(level)
 	
 	// Changes background to new level background
 	setLevelBackgroundImage(currentLevel);
+	
+	if(currentLevel != 1){
+		// Changes Game Message, except for first level
+		var messageImageName = "messagelevel" + currentLevel;
+		changeGameMessage(messageImageName);
+		// Then erases it after 3 seconds
+		setTimeout('changeGameMessage("");', 3000)	
+	}
 }
 
 // Changes currentLevelType and the background of the ball to reflect that level
