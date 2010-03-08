@@ -22,27 +22,15 @@
 
 	<!-- Home screen -->
 	<div id="home">
-		
-		<div id="playmenu" onclick="jQT.goTo('#game-screen', 'cube')"><img src="images/playmenu.png" alt="Play"/></div>
+		<div id="playmenu" onclick="jQT.goTo('#game-screen')"><img src="images/playmenu.png" alt="Play"/></div>
 		<div id="preferencesmenu" onclick="jQT.goTo('#settings', 'cube')"><img src="images/preferencesmenu.png" alt="Preferences"/></div>
 		<div id="howtoplaymenu" onclick="jQT.goTo('#how-to-play', 'cube')"><img src="images/howtoplaymenu.png" alt="How to Play"/></div>
 		<div id="aboutmenu" onclick="jQT.goTo('#about', 'cube')"><img src="images/aboutmenu.png" alt="About"/></div>
-		
-		
-		<!-- <div class="toolbar">
-			<h1>Double Dribble</h1>
-		</div>
-		<ul class="rounded">
-			<li class="arrow"><a href="#game-screen">Play!</a></li>
-			<li class="arrow"><a href="#settings">Preferences</a></li>
-		</ul>
-		-->
-		
 	</div>
 
 	<!-- Game screen -->
 	<div id="game-screen">
-		<div id="full-screen-area">
+		<div id="full-screen-area" onclick="pauseGame()">
 		  <div id="level-screen">
 			  <div id="score">0 pts</div>
 			  <div id="ball" class="ballClass">
@@ -60,23 +48,16 @@
 			  <div id="game-start"></div>
 			  <div id="game-messageboard"></div>
 			</div>
-			<div id="baseboard" class="baseboardclass">
-			</div>
-			<div id="answerboard" class="baseboardclass">
-			</div>
-			<div id="baseMin" class="all-text">
-			</div>
-			<div id="baseMax" class="all-text">
-			</div>
-			<div id="blackarrowleft">
-			</div>
-			<div id="blackarrowright">
-			</div>
-			
-			
+			<div id="baseboard" class="baseboardclass"></div>
+			<div id="answerboard" class="baseboardclass"></div>
+			<div id="baseMin" class="all-text"></div>
+			<div id="baseMax" class="all-text"></div>
+			<div id="blackarrowleft"></div>
+			<div id="blackarrowright"></div>
 		</div>
 	</div>
-	
+
+	<!-- Settings screen -->	
 	<div id="settings">
 		<div class="toolbar">
 			<h1>Settings</h1>
@@ -85,7 +66,7 @@
 		<form method="post">
 			<ul>
 				<li>Sound <span class="toggle"><input type="checkbox" name="sound" id="sound" value="soundOn" /></span></li>
-				<li><span>Gravity </span><input type="text" name="gravity" id="gravity" maxlength="5" /></li>
+				<li><span>Gravity </span><input type="text" name="gravity" id="gravity" /></li>
 				<li>Right Answer Gravity Change
 					<select id="gravity-change">
 						<option value="g-static">Static (no change)</option>
@@ -109,7 +90,7 @@
 	
 	<!-- About screen -->	
 	<div id="about">
-		<div id="aboutback" onclick="jQT.goTo('#home', 'cube')"><img src="images/aboutback.png" alt="Back"/></div>
+		<div id="aboutback" onclick="jQT.goBack('#home', 'cube')"><img src="images/aboutback.png" alt="Back"/></div>
 	</div>
 	
 </body>

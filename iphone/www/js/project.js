@@ -45,14 +45,14 @@ var closeEnoughError = 15;
 //accelerometer variables to make the object bounce
 var horizontalChange = 0.0; // Maintains the state of the accelerometer
 
+//game paused or not
+var gamePaused = false;
+
 // Used to turn sound on or off
 var isSoundOn = true;
 
 // whether the game is over
 var gameIsOver = true;
-
-//not needed remove later 
-var yDELTA = 1.0;
 
 // whether or not the player is playing the first problem in the game
 var firstProblemInTheGame;
@@ -85,6 +85,9 @@ var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
+// Dunking
+var dunkGForce = 1.05;
+var accelerometerFrequency = 60;
 
 // Initialization method
 $(function() {
@@ -94,6 +97,8 @@ $(function() {
     $("body > *").css("minHeight", "460px !important");
   }	
   
+	document.addEventListener("touchmove",function(e){e.preventDefault();},false); //prevent scrolling 
+	
   $(document).ready(pageIsLoaded);
 });
 
@@ -148,7 +153,7 @@ function gameScreenHasAppeared(event, info)
 	
 	// Set up gravity and initialize oldTime for ball movement
 	changeGravity(INIT_GRAVITY);
-	_oldTime = new Date().getTime();
+	setBallAtHeight(260.0, true);
 	
 	// Reset game state
 	restartGame();
@@ -226,6 +231,7 @@ function setGravityChange(changeValue) {
 }
 
 /******* ACCELEROMETER CODE *******/
+var accelerometerStarted = false;
 function startWatchingForShaking() {
 	if (usingSimulator) {
 		return;
@@ -236,36 +242,36 @@ function startWatchingForShaking() {
 	};
 	var fail = function(){};
 	var options = {};
-	options.frequency = 100;
-	var watcher = navigator.accelerometer.watchAcceleration(win, fail, options);
+	options.frequency = accelerometerFrequency;
+	
+	// This is so we don't start multiple accelerometer callbacks
+	if (!accelerometerStarted) {
+		navigator.accelerometer.watchAcceleration(win, fail, options);
+		accelerometerStarted = true;
+	}
 }
 
+var highestZ = 0.0;
 function accelerometerFired(coords) {
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
+	} else if (dunkGForce < Math.abs(coords.z)) {
+		if (Math.abs(coords.z) > highestZ) {
+			highestZ = coords.z;
+		}
+		alert("Dunk!!!\ncoords.z: "+coords.z+" highest: "+highestZ);
 	}
 	horizontalChange += coords.x * 4.0;
 }
+
+
 
 //initialize baseboard settings
 function initBaseBoard(){
 	this.offset = 10;
 }
 
-/******* BUTTON CODE *******/
-function leftAxisClick() {
-	if (horizontalChange > 0.0) {
-		horizontalChange = 0.0;
-	}
-	horizontalChange -= yDELTA;	
-}
-
-function rightAxisClick() {
-	if (horizontalChange < 0.0) {
-		horizontalChange = 0.0;
-	}
-	horizontalChange += yDELTA;
-}
+/******* ANIMATION & MAIN GAME LOOP CODE *******/
 
 function animationLoop()
 {
@@ -276,10 +282,11 @@ function animationLoop()
 	
 	// Move the ball up/down	
 	var newTop = getTopForTime();
-	if (newTop > _yInitial) {
+	if (newTop >= _yInitial) {
 		newTop = _yInitial;
 		_oldTime = _newTime;
 	}
+	
 	$(ball).css("top", newTop);
 	
 	// Move the ball left/right
@@ -515,6 +522,11 @@ function showArrowHint(X,Y,answer){
 		var width   = parseInt($("#blackarrowleft").css("width"));
 		var newLeft = left + (Y - left) - width;
 		
+		//does the arrow go past the answer ?
+		if ((newLeft - width) < answer){
+			newLeft = newLeft + width;
+		}
+		
 	  //set the new left value for the arrow 
 		$("#blackarrowleft").css("margin-left",newLeft);			
 		$("#blackarrowleft").css("visibility","visible");	
@@ -523,7 +535,13 @@ function showArrowHint(X,Y,answer){
 	//if the answer is greater than the current location, show the right arrow
 	else{
 		var left    = parseInt($("#blackarrowright").css("margin-left"));
+		var width   = parseInt($("#blackarrowright").css("width"));
 		var newLeft = left + (Y - left);
+		
+		//does the arrow go past the answer ?
+		if ((newLeft + width) > answer){
+			newLeft = newLeft - width;
+		}
 		
 		//set the new left value for the arrow 
 		$("#blackarrowright").css("margin-left",newLeft);			
@@ -555,11 +573,11 @@ function showDenominatorHint(X,Y,answer){
 	//compute points on the number line
 	i = 1;
 	while ( (i / denom) < baseboardMax){
-	  //compute the decimal value of the point
-	  decimalvalue	= i / denom; 
+		//compute the decimal value of the point
+		decimalvalue = i / denom; 
 		
 		//compute the pixel where it should be on the baseboard 
-	  answer        = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
+		answer       = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
 		
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
@@ -606,8 +624,13 @@ function displayAnswerBoardClose(answerY){
 
 // if the correct answer was selected then light up the board 
 function displayAnswerBoardDeadOn(answerY){
+	
 	//set the newWidth to where the correct answer point is
 	var newWidth = answerY - bboffset;
+	
+	//special case for when the answer is 0. Set pixel width to 1 to display
+  //the answer. 
+	if (newWidth == 0) newWidth = 1;
 	
 	$("#answerboard").css("background-color","red");
 	$("#answerboard").css("width",newWidth);
@@ -623,6 +646,37 @@ function clearAnswerBoard(answerY){
 	$("#answerboard").fadeOut('slow');
 }5
 
+
+//When the screen is tapped the first time pause the game
+//When its tapped again unpause and move to a new problem
+function pauseGame(){
+	
+	// if the game isn't paused then pause it
+	if (!gamePaused){
+		gamePaused = true;
+    clearInterval(timerLoop);		
+	}
+	//else restart with a new problem
+	else{
+		//set pause to false
+		gamePaused = false;
+		//get the next problem
+	  nextProblem();
+		//compute the answer for this problem
+		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
+		//set current try to 0 since we are changing the problem here
+		currentTry = 0;
+		//start at the current level
+		restartLevel(currentLevel);
+	}
+}
+
+function startGame(){
+	//pick a new problem
+	
+	//start the animation loop again
+	
+}
 
 function gameOver(){
 	$("#game-over").css("visibility", "visible");
@@ -669,21 +723,73 @@ function restartLevel(level) {
 /**
  * Improved gravity
  *                     1   2
- *           y = v  +  - gt
+ *           y = v t + - gt
  *                ˚    2
  */
 var _gravity;
 var _ballBounceHeight = 330.0;
 var _yInitial = 360.0; // TODO: tie this to location of baseboard
-var _roundtripTime = 2500;
 function changeGravity(newGravity) {
 	_gravity = newGravity / 1000.0;
-	var time = Math.sqrt( 2.0 *  _ballBounceHeight / _gravity ); 
+	var time = getGravityTime();
 	_initialVelocity = -1.0 * ( _ballBounceHeight / time + _gravity * time / 2.0 );
+}
+
+// This is the time to go from the bottom to the top of the screen
+function getGravityTime() {
+	return Math.sqrt( 2.0 *  _ballBounceHeight / _gravity );
 }
 
 function getAdjustedGravity() {
 	return _gravity * 1000.0;
+}
+
+/**
+ * Change gravity at a point      _____
+ *                               / g   
+ *                    t  = t    /   1
+ *                     2    1  /  ---
+ *                            /    g
+ *                           √      2
+ */
+function changeGravityAtPoint(newGravity) {
+	var currTime = new Date().getTime();
+	var newTime = (currTime - _oldTime) * Math.sqrt(getAdjustedGravity() / newGravity);
+	
+	changeGravity(newGravity);
+	_oldTime = currTime - newTime;
+	
+}
+
+function tempGravityChange() {
+	var oldGravity = getAdjustedGravity();
+	
+	changeGravityAtPoint(.007);
+	setTimeout("resetGravity("+oldGravity+")", 2000);
+}
+
+function resetGravity(gravity) {
+	changeGravityAtPoint(parseFloat(gravity));
+}
+
+// If falling is true, then this calculates the position of the ball at the given height with the ball dropping.
+function setBallAtHeight(height, falling) {
+	// alert("setBallAtHeight");
+	var distance;
+	var time;
+	
+	if (falling) {
+		distance = height - (_yInitial - _ballBounceHeight);
+		time = Math.sqrt(2 * distance / _gravity); // calculate
+		time += getGravityTime(); // add the time to get to the top of the screen
+		time *= -1.0; // make this value negative for the _oldTime calculation below
+		
+	} else {
+		distance = _yInitial - height;
+		time = (_initialVelocity + Math.sqrt(_initialVelocity * _initialVelocity - 2*_gravity*distance)) / _gravity;
+	}
+	
+	_oldTime = new Date().getTime() + time;
 }
 
 /**
@@ -700,8 +806,8 @@ function getTopForTime() {
 	_newTime = new Date().getTime();
 	
 	var newTop;
-	if (_newTime == _oldTime) {
-		newTop = _xInitial;
+	if (_newTime <= _oldTime) {
+		newTop = _yInitial;
 	} else {
 		var timeDelta = _newTime - _oldTime;
 		newTop = _yInitial + timeDelta * ( _initialVelocity + _gravity * timeDelta / 2.0 );
