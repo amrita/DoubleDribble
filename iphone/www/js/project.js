@@ -888,7 +888,11 @@ function bullseyeAnswer(answer)
 {
 	playBullseyeSound();
 	adjustScore('bullseye');
-	if(isDunking){changeGameMessage("dddunk");}
+	if(dunkWait){
+		changeGameMessage("dddunk");
+		// Then erases it after 1 seconds
+		setTimeout('changeGameMessage("");', 1000)
+	}
 	adjustProblemProbabilities('bullseye');
 	nextProblem();
 }
@@ -898,7 +902,11 @@ function closeEnoughAnswer()
 {
 	playCloseEnoughSound();
 	adjustScore('closeEnough');
-	if(isDunking){changeGameMessage("dddunk");}
+	if(dunkWait){
+		changeGameMessage("dddunk");
+		// Then erases it after 1 seconds
+		setTimeout('changeGameMessage("");', 1000)
+	}
 	adjustProblemProbabilities('closeEnough');
 	nextProblem();
 }
@@ -946,26 +954,31 @@ function playSoundIfSoundIsOn(media) {
 // Increases score based on accuracy and currentTry
 function adjustScore(accuracy)
 {
+	var dunkBonus = 0;	
 	if(currentTry > 2){
 		return;
 	}
 	else if(currentTry == 1){
 		switch(accuracy){
 			case 'bullseye':
-				increaseScore(20);
+				if(dunkWait){dunkBonus = 10;}
+				increaseScore(20 + dunkBonus);
 				break;
 			case 'closeEnough':
-				increaseScore(15);
+				if(dunkWait){dunkBonus = 5;}
+				increaseScore(15 + dunkBonus);
 				break;
 		}
 	}
 	else if(currentTry == 2){
 		switch(accuracy){
 			case 'bullseye':
-				increaseScore(15);
+				if(dunkWait){dunkBonus = 10;}
+				increaseScore(15 + dunkBonus);
 				break;
 			case 'closeEnough':
-				increaseScore(10);
+				if(dunkWait){dunkBonus = 5;}
+				increaseScore(10  + dunkBonus);
 				break;	
 		}
 	}
