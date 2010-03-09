@@ -283,8 +283,8 @@ function animationLoop()
 		
 		if (isDunking) {
 			isDunking = false;
-			changeGravity(INIT_GRAVITY); // NOTE: if you are changing gravity for correct answers, this
-										 // will reset the delta
+			changeGravity(INIT_GRAVITY); // NOTE: if you are changing gravity for correct answers,
+										 // this will reset the delta
 			setTimeout("dunkWait = false;", 500);
 		}
 	}
