@@ -6,10 +6,11 @@ var jQT = new $.jQTouch({
 	statusBar: 'default'
 });
 
+
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 2; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -41,7 +42,7 @@ var bboffset = 10;
 var bbcolors  = ['black','blue','green','purple'];
 var bbcolorid = 0;
 
-var error			 = 7; // error allowed in pixels. 
+var error			 = 4; // error allowed in pixels. 
 var closeEnoughError = 15;
 
 //accelerometer variables to make the object bounce
@@ -88,7 +89,8 @@ var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
 // Dunking
-var dunkGForce = 1.5;
+var dunkGForce = 1.5;  // set to 4 to eliminate dunking
+
 var accelerometerFrequency = 60;
 var isDunking = false;
 var dunkWait = false;
@@ -382,7 +384,6 @@ function checkAnswer(X,Y,answer,ball){
 				currentTry = 1;
 				clearInterval(timerLoop);	
 				clearArrowHint();
-				clearDenominatorHint();
 				displayAnswerBoardDeadOn(answerY);
 				gameOver();	
 				break;
@@ -552,7 +553,7 @@ function showArrowHint(X,Y,answer){
 
 function clearArrowHint(){
 	$("#blackarrowright").css("margin-left",0);	
-  $("#blackarrowright").css("visibility","hidden");	
+    $("#blackarrowright").css("visibility","hidden");	
 	$("#blackarrowright").css("margin-right",0);
 	$("#blackarrowleft").css("visibility","hidden");	
 	
@@ -653,20 +654,35 @@ function pauseGame(){
 	// if the game isn't paused then pause it
 	if (!gamePaused){
 		gamePaused = true;
-    clearInterval(timerLoop);		
+		
+		// Shows pause indicator
+		var pauseMessage = "url('images/pause.png')";
+		$("#pause-indicator").css("background-image", pauseMessage);
+		
+		clearInterval(timerLoop);	
 	}
 	//else restart with a new problem
 	else{
 		//set pause to false
 		gamePaused = false;
+		
+		// erases any baseboard hints
+		clearArrowHint();
+		clearDenominatorHint(currentProblem.denominator);		
+		
 		//get the next problem
-	  nextProblem();
+		nextProblem();
 		//compute the answer for this problem
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		//set current try to 0 since we are changing the problem here
 		currentTry = 0;
-		//start at the current level
-		restartLevel(currentLevel);
+		
+		// erases pause indicator
+		var pauseMessage = "url('images/.png')";
+		$("#pause-indicator").css("background-image", pauseMessage);
+				
+		//restarts animation
+		timerLoop = setInterval("animationLoop()", 50);
 	}
 }
 
@@ -833,24 +849,6 @@ function problemObject()
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
 }
 
-/*
-function initialize()
-{
-	createFractionProblem2DArray(); 
-	createMultiplicationProblem2DArray();
-	initializeProbabilities();
-	currentProblem = fractionProblems[2][1];
-	
-	displayFirstProblem();
-}
-*/
-
-// Shows the first problem "1", and then once the 1 is solved correctly, pulls the next problem
-// TODO: implement
-function displayFirstProblem()
-{
-	
-}
 
 // Initializes the game sounds
 function initializeGameSounds()
@@ -890,6 +888,11 @@ function bullseyeAnswer(answer)
 {
 	playBullseyeSound();
 	adjustScore('bullseye');
+	if(dunkWait){
+		changeGameMessage("dddunk");
+		// Then erases it after 1 seconds
+		setTimeout('changeGameMessage("");', 1000)
+	}
 	adjustProblemProbabilities('bullseye');
 	nextProblem();
 }
@@ -897,23 +900,15 @@ function bullseyeAnswer(answer)
 // Calls the appropriate closeEnough sound and graphic, adjusts the score, and pulls the next problem
 function closeEnoughAnswer()
 {
-	displayCloseEnoughGraphic();
 	playCloseEnoughSound();
-	adjustScore('closeEnough');	
+	adjustScore('closeEnough');
+	if(dunkWait){
+		changeGameMessage("dddunk");
+		// Then erases it after 1 seconds
+		setTimeout('changeGameMessage("");', 1000)
+	}
 	adjustProblemProbabilities('closeEnough');
 	nextProblem();
-}
-
-// Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
-function displayCloseEnoughGraphic()
-{
-	
-}
-
-// Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
-function displayBullseyeGraphic()
-{
-
 }
 
 // Plays the explosion sound, plus a random sound from the bullseyeSounds Array (but only up to the level of the current level)
@@ -934,12 +929,6 @@ function playWrongAnswerSound(ballYMinusAnswer)
 	} else {
 		playSoundIfSoundIsOn(wrongAnswerSounds[0]);		
 	}	
-}
-
-// Displays the graphic that highlights the baseboard and shows the decimal equivalent under the baseboard
-function displayCloseEnoughGraphic()
-{
-	
 }
 
 // Plays a random sound from the closeEnoughSoundArray, but only up to the level of the current level
@@ -965,26 +954,31 @@ function playSoundIfSoundIsOn(media) {
 // Increases score based on accuracy and currentTry
 function adjustScore(accuracy)
 {
+	var dunkBonus = 0;	
 	if(currentTry > 2){
 		return;
 	}
 	else if(currentTry == 1){
 		switch(accuracy){
 			case 'bullseye':
-				increaseScore(20);
+				if(dunkWait){dunkBonus = 10;}
+				increaseScore(20 + dunkBonus);
 				break;
 			case 'closeEnough':
-				increaseScore(15);
+				if(dunkWait){dunkBonus = 5;}
+				increaseScore(15 + dunkBonus);
 				break;
 		}
 	}
 	else if(currentTry == 2){
 		switch(accuracy){
 			case 'bullseye':
-				increaseScore(15);
+				if(dunkWait){dunkBonus = 10;}
+				increaseScore(15 + dunkBonus);
 				break;
 			case 'closeEnough':
-				increaseScore(10);
+				if(dunkWait){dunkBonus = 5;}
+				increaseScore(10  + dunkBonus);
 				break;	
 		}
 	}
@@ -1192,12 +1186,14 @@ function getNewProblem()
 {
 	switch(currentLevelType){
 		case 'fraction':
+			var oldNumer = currentProblem.numerator;
+			var oldDenom = currentProblem.denominator;
 			do{	
 				var randomFloat = Math.random();
 				var denom = getRandomInteger(2,highestDenominator[currentLevel]);
 				var numer = getRandomInteger(0,(denom * baseboardMax));
-			} while(randomFloat > fractionProblems[denom][numer].probability);   
-			// exits the do loop once it has found a problem probability higher than the randomFloat
+			} while(randomFloat > fractionProblems[denom][numer].probability || ((denom == oldDenom) && (numer == oldNumer)));   
+			// exits the do loop once it has found a problem probability higher than the randomFloat, and ensures new problem is not identical
 			currentProblem = fractionProblems[denom][numer];
 			break;
 		case 'multiplication':
