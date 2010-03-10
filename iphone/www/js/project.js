@@ -243,6 +243,7 @@ function startWatchingForShaking() {
 	if (!accelerometerStarted) {
 		navigator.accelerometer.watchAcceleration(win, fail, options);
 		accelerometerStarted = true;
+		alert("accel started");
 	}
 }
 
@@ -381,8 +382,7 @@ function checkAnswer(X,Y,answer,ball){
 				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:	
-				currentTry = 1;
-				clearInterval(timerLoop);	
+				currentTry = 1;	
 				clearArrowHint();
 				displayAnswerBoardDeadOn(answerY);
 				gameOver();	
@@ -630,7 +630,7 @@ function displayAnswerBoardDeadOn(answerY){
 	
 	//special case for when the answer is 0. Set pixel width to 1 to display
   //the answer. 
-	if (newWidth == 0) newWidth = 1;
+	if (newWidth == 0) newWidth = 2;
 	
 	$("#answerboard").css("background-color","red");
 	$("#answerboard").css("width",newWidth);
@@ -650,6 +650,11 @@ function clearAnswerBoard(answerY){
 //When the screen is tapped the first time pause the game
 //When its tapped again unpause and move to a new problem
 function pauseGame(){
+	
+	// This is to prevent pause from kicking off or overwriting the animationLoop() timer
+	if (gameIsOver) {
+		return;
+	}
 	
 	// if the game isn't paused then pause it
 	if (!gamePaused){
@@ -694,6 +699,8 @@ function startGame(){
 }
 
 function gameOver(){
+	clearInterval(timerLoop);
+	
 	$("#game-over").css("visibility", "visible");
 	$("#game-over").fadeIn("slow");
 	
@@ -790,9 +797,11 @@ function resetGravity(gravity) {
 /**
  * If falling is true, then this calculates the position of the ball at the given height with the ball dropping.
  * This is opposed to false where the ball is calculated on the way up.
- *
- * 
- * 
+ *                     ________
+ *                    / 2
+ *          t = v +  √ v  - 2gy
+ *               ˚   ----------
+ *                        g
  */
 function setBallAtHeight(height, falling) {
 	// alert("setBallAtHeight");
