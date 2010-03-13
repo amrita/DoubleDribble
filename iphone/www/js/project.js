@@ -59,6 +59,9 @@ var gamePaused = false;
 // Used to turn sound on or off
 var isSoundOn = true;
 
+// How long the phone vibrates on an explosion/bullseye in milliseconds
+var vibrateTime = 600;
+
 // whether the game is over
 var gameIsOver = true;
 
@@ -1028,6 +1031,8 @@ function playBullseyeSound()
 	var random = getRandomInteger(1, Math.min((bullseyeSounds.length - 1), (currentLevel - 1)));
 	playSoundIfSoundIsOn(bullseyeSounds[0]);  // Exposion sound
 	playSoundIfSoundIsOn(bullseyeSounds[random]);  // + random sound = delicious
+	
+	navigator.notification.vibrate(vibrateTime); // TODO: Vibrate does not seem to be working...
 }
 
 /********* SOUND CODE **********/
