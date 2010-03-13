@@ -55,7 +55,7 @@
 {
 	background-color: white;
 	width: 320px;
-	height: 460px;
+	height: 480px;
 }
 
 #level-screen
@@ -186,6 +186,40 @@
 	position: absolute;
 	line-height: 30px;
 }
+
+.numerHint
+{
+  margin-top: 430px;
+	margin-left: 0px auto;
+	
+	width: 15px;
+	position: absolute;
+	
+	font-family: Helvetica;
+	font-size: 15pt;
+	text-align: center;
+}
+
+.lineHint
+{
+  margin-top: 440px;
+	margin-left: 0px;
+	position: absolute;
+}
+
+.denomHint
+{
+  margin-top: 450px;
+	margin-left: 0px auto;
+	
+	width: 15px;
+	position: absolute;
+	
+	font-family: Helvetica;
+	font-size: 15pt;
+	text-align: center;
+}
+
 
 .ballClass
 {
