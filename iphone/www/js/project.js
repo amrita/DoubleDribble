@@ -10,7 +10,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 5; 
+var skunk = 2; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -31,6 +31,11 @@ var ballX;
 var ballY;
 
 var answerY;
+
+//scaffold upto level 
+var highScaffold = 2;
+var lowScaffold  = 4;
+var isScaffolded = false;
 
 //top of the baseboard
 var topBaseboard;
@@ -347,8 +352,6 @@ function checkAnswer(X,Y,answer,ball){
 			closeEnoughAnswer(answer);
 		}
 		
-		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
-		
 		//clear the display answer board;
 		clearAnswerBoard();
 		//clear any existing hints
@@ -356,12 +359,15 @@ function checkAnswer(X,Y,answer,ball){
 		//clear the number line hints
 		clearDenominatorHint(olddenom);
 		
+		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
+		
+		//reset current try to 0
+		currentTry = 0;
+		
 		if (currentTry == 1) {
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
-		//reset current try to 1
-		currentTry = 1;
 		
 		if (firstProblemInTheGame) {
 			firstProblemInTheGame = false;
@@ -369,6 +375,12 @@ function checkAnswer(X,Y,answer,ball){
 	} else {
 		//increment the number of tries 
 		currentTry++;
+		
+		if (currentTry > 0){
+		  //add scaffolding if needed
+			addScaffolding();	
+		}
+		
 		streakCounter = 0;
 		adjustProblemProbabilities('wrong');
 		
@@ -388,7 +400,7 @@ function checkAnswer(X,Y,answer,ball){
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
-				showDenominatorHint(X,Y,answer);
+				showDenominatorHint(answer);
 				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:	
@@ -462,11 +474,22 @@ function computeBoardLocation(problemId,bMin,bMax){
 	return answer;
 }
 
+function addScaffolding(){
+	//if we are in scaffolding display denonminator hints
+	if (currentLevel < lowScaffold){
+		showDenominatorHint(answerY);
+		isScaffolded = true;
+	}	
+}
+
+
 function addBall()
 {
 	computeBaseboardAnswer(currentProblem.decimalEquivalent,baseboardMin,baseboardMax);
 	
 	displayCurrentProblem();
+	
+	addScaffolding();
 	
 	// Make the ball's background visible
 	var newBg = "url('images/fractionball.png')";
@@ -572,13 +595,19 @@ function clearArrowHint(){
 
 // show either the left or the right hint arrow based on the position
 // of the ball as opposed to the correct answer 
-function showDenominatorHint(X,Y,answer){
+function showDenominatorHint(answer){
 
 	var decimalvalue;
 	var answer;
+	var showHint = 0;
 	
 	var denom = currentProblem.denominator;
 	var numer = currentProblem.numerator;
+	
+	//if already present then return
+	if (isScaffolded){
+		return;
+	}
 	
 	//compute points on the number line
 	i = 1;
@@ -588,7 +617,7 @@ function showDenominatorHint(X,Y,answer){
 		
 		//compute the pixel where it should be on the baseboard 
 		answer       = computeBoardLocation(decimalvalue,baseboardMin, baseboardMax);
-		
+	
 		//add the hint line to the pixel on the baseboard 
 		$("#full-screen-area").append('<div id="hint-' + i + '" class="dHint"></div>');
 		
@@ -597,6 +626,43 @@ function showDenominatorHint(X,Y,answer){
 		
 		//move the hint to the correct place on the number line
 		pHint.css("margin-left",answer);
+		
+		//if the scaffold is high then add the hint every single time.
+		//if the scaffold is low then only add random hints
+		if(currentLevel < lowScaffold){
+			showHint = getRandomInteger(0,1);
+			if (answer == answerY) showHint = 0; //do not display a hint for the answer if scaffold is low
+		}
+		
+		if (currentLevel < highScaffold || showHint){
+		  //add the hint value below the baseboard 
+		  $("#full-screen-area").append('<div id="hintnumer-' + i + '" class="numerHint">'+ i +'</div>');
+		  $("#full-screen-area").append('<div id="hintline-'  + i + '" class="lineHint"> -- </div>');
+		  $("#full-screen-area").append('<div id="hintdenom-' + i + '" class="denomHint">'+ denom +'</div>');
+		
+	
+		  //Now, we need to grab a reference to the number hint we just added to the HTML
+		  var nHint = $("#hintnumer-" + i);
+		  var lHint = $("#hintline-" + i);
+		  var dHint = $("#hintdenom-" + i);
+
+		
+		  //move the hint to the correct place on the number line
+			//need to clean this up 
+			if (i > 10){
+		    nHint.css("margin-left",answer - 10);
+			}
+			else{
+				nHint.css("margin-left",answer - 7);
+			}
+		  lHint.css("margin-left",answer - 6);
+			if (denom > 10){
+		    dHint.css("margin-left",answer - 10);
+			}
+			else{
+				dHint.css("margin-left",answer - 7);
+			}
+		}
 		
 		//if the value of decimal value of this hint is 1, change its color to orange
 		if (decimalvalue == 1){
@@ -614,8 +680,12 @@ function clearDenominatorHint(denom){
 	var i = 1;
   while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
+		$('#hintnumer-' + i).remove();
+		$('#hintline-' + i).remove();
+		$('#hintdenom-' + i).remove();
 		i++;
 	}
+	isScaffolded = false;
 }
 
 // if the correct answer was selected then light up the board 
@@ -689,6 +759,9 @@ function pauseGame(){
 		nextProblem();
 		//compute the answer for this problem
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
+		//add scaffolding if needed
+		addScaffolding();
+		
 		//set current try to 0 since we are changing the problem here
 		currentTry = 0;
 		
