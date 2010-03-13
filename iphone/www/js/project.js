@@ -97,6 +97,11 @@ var dunkWait = false;
 var preDunkGravity;
 var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
+// TODO: Secret Presidential Easter Egg
+var isSecretOn = false;
+var secretThreshold = 0.9;
+var secretVal = 0.0;
+
 // Initialization method
 $(function() {
   
@@ -243,7 +248,6 @@ function startWatchingForShaking() {
 	if (!accelerometerStarted) {
 		navigator.accelerometer.watchAcceleration(win, fail, options);
 		accelerometerStarted = true;
-		alert("accel started");
 	}
 }
 
@@ -258,7 +262,13 @@ function accelerometerFired(coords) {
 		_gravity *= dunkGravityChange;
 		isDunking = true;
 		dunkWait = true;
+	} else if (secretThreshold < coords.z) {
+		isSecretOn = true;
+		secretVal = coords.z;
+	} else {
+		isSecretOn = false;
 	}
+	
 	horizontalChange += coords.x * 4.0;
 }
 
@@ -804,7 +814,6 @@ function resetGravity(gravity) {
  *                        g
  */
 function setBallAtHeight(height, falling) {
-	// alert("setBallAtHeight");
 	var distance;
 	var time;
 	
@@ -1248,4 +1257,10 @@ function getRandomInteger(min,max)
 }
 
 
+/********* SECRET CODE **********/
 
+function secretClick() {
+	if (isSecretOn) {
+		alert("Jump to Secret Level!");
+	}
+}
