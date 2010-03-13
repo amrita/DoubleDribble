@@ -58,7 +58,8 @@ var isSoundOn = true;
 var gameIsOver = true;
 
 // whether or not the player is playing the first problem in the game
-var firstProblemInTheGame;
+var numBeginnerProblems = 5;
+var numBeginnerProblemsLeft = numBeginnerProblems;
 
 var currentLevel = 1;    // Tracks the player's current level
 var highestLevel = 8;    // The highest level achieveable in the game
@@ -97,7 +98,7 @@ var dunkWait = false;
 var preDunkGravity;
 var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
-// TODO: Secret Presidential Easter Egg
+// Secret Presidential Easter Egg
 var isSecretOn = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
@@ -353,6 +354,7 @@ function checkAnswer(X,Y,answer,ball){
 		clearAnswerBoard();
 		//clear any existing hints
 		clearArrowHint();
+		clearUpArrowHint();
 		//clear the number line hints
 		clearDenominatorHint(olddenom);
 		
@@ -363,18 +365,17 @@ function checkAnswer(X,Y,answer,ball){
 		//reset current try to 1
 		currentTry = 1;
 		
-		if (firstProblemInTheGame) {
-			firstProblemInTheGame = false;
-		}
+		numBeginnerProblemsLeft--;
+		
 	} else {
 		//increment the number of tries 
 		currentTry++;
 		streakCounter = 0;
 		adjustProblemProbabilities('wrong');
 		
-		// The first time the user has infinite tries
-		if (firstProblemInTheGame && currentTry > 3) {
-			currentTry = 3;
+		// The first numBeginnerProblems times the user has infinite tries
+		if (numBeginnerProblemsLeft > 0 && currentTry > 4) {
+			currentTry = 4;
 		}
 		
 		//the current try is 
@@ -391,7 +392,12 @@ function checkAnswer(X,Y,answer,ball){
 				showDenominatorHint(X,Y,answer);
 				playWrongAnswerSound(Y - answer);
                 break;
-		  case 4:	
+		  case 4:
+				showUpArrowHint(answerY);
+				if (numBeginnerProblemsLeft > 0 || currentLevel == 1) {
+					break;
+				}
+		  case 5:
 				currentTry = 1;	
 				clearArrowHint();
 				displayAnswerBoardDeadOn(answerY);
@@ -402,6 +408,15 @@ function checkAnswer(X,Y,answer,ball){
 	}
 }
 
+// TODO: Move me
+function showUpArrowHint(newLeft) {
+	$("#uparrow").css("margin-left",newLeft - 10); // newLeft minus 1/2 the width of the uparrow image			
+	$("#uparrow").css("visibility","visible");	
+}
+
+function clearUpArrowHint() {
+	$("#uparrow").css("visibility","hidden");	
+}
 
 //set the current x,y co-ordinates of the ball 
 function setObjectXY(obj){
@@ -423,10 +438,9 @@ function setObjectXY(obj){
 //based on the current problem decimal value compute the 
 //x,y co-ordinates on the baseboard which is the 
 //exact correct answer to the problem 
-
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
 function computeBaseboardAnswer(problemId,bMin,bMax){
-  var phoneWidth = 300;
+	var phoneWidth = 320 - 2*bboffset;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	//everything is now offset by 10 pixels
@@ -562,9 +576,7 @@ function showArrowHint(X,Y,answer){
 }
 
 function clearArrowHint(){
-	$("#blackarrowright").css("margin-left",0);	
     $("#blackarrowright").css("visibility","hidden");	
-	$("#blackarrowright").css("margin-right",0);
 	$("#blackarrowleft").css("visibility","hidden");	
 	
 }
@@ -638,7 +650,7 @@ function displayAnswerBoardDeadOn(answerY){
 	//set the newWidth to where the correct answer point is
 	var newWidth = answerY - bboffset;
 	
-	//special case for when the answer is 0. Set pixel width to 1 to display
+	//special case for when the answer is 0. Set pixel width to 2 to display
   //the answer. 
 	if (newWidth == 0) newWidth = 2;
 	
@@ -727,11 +739,19 @@ function restartGame() {
 	// Set that we're starting the game
 	firstProblemInTheGame = true;
 	
+	// TODO: Jacob: Reset probabilities
+	
 	restartLevel(1);
 }
 
 // This resets all values for a 'new' game.
 function restartLevel(level) {
+	
+	clearUpArrowHint(); // Just in case it's still on
+	
+	// TODO: This could also go in restartGame if we don't want to scaffold other levels, but GA is for all-level scaffolding
+	//       If anything, could only do this     if (level <= 5)
+	numBeginnerProblemsLeft = numBeginnerProblems;
 	
 	// level is undefined when the UI calls this function
 	if (level == undefined) {
@@ -747,7 +767,6 @@ function restartLevel(level) {
 	
 	gameIsOver = false;
 	
-	// TODO: Jacob: Do you want to reset probabilities here or in restartGame()? Restart game
 }
 
 /********* INIT_GRAVITY CODE **********/

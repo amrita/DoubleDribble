@@ -159,6 +159,18 @@
 	visibility: hidden;
 }
 
+#uparrow {
+	background-image: url('../images/uparrow.gif');
+	width: 20px;
+	height: 27px;
+
+	margin-top: 432px;
+	margin-left: 30px;
+	position: absolute;
+	
+	visibility: hidden;
+}
+
 #baseMin
 {
 	margin-top: 430px;
