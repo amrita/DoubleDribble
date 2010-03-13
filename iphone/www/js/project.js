@@ -822,10 +822,6 @@ function restartLevel(level) {
 	
 	clearUpArrowHint(); // Just in case it's still on
 	
-	// TODO: This could also go in restartGame if we don't want to scaffold other levels, but GA is for all-level scaffolding
-	//       If anything, could only do this     if (level <= 5)
-	numBeginnerProblemsLeft = numBeginnerProblems;
-	
 	// level is undefined when the UI calls this function
 	if (level == undefined) {
 		level = currentLevel;
@@ -834,6 +830,11 @@ function restartLevel(level) {
 	
 	setScore(0);
 	setLevel(level);
+	
+	// Scaffolding happens for all levels less than six
+	if (level <= 5) {
+		numBeginnerProblemsLeft = numBeginnerProblems;
+	}
 	
 	// This is the animation timer
 	timerLoop = setInterval("animationLoop()", 50);
