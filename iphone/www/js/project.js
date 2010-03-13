@@ -420,16 +420,6 @@ function checkAnswer(X,Y,answer,ball){
 	}
 }
 
-// TODO: Move me
-function showUpArrowHint(newLeft) {
-	$("#uparrow").css("margin-left",newLeft - 10); // newLeft minus 1/2 the width of the uparrow image			
-	$("#uparrow").css("visibility","visible");	
-}
-
-function clearUpArrowHint() {
-	$("#uparrow").css("visibility","hidden");	
-}
-
 //set the current x,y co-ordinates of the ball 
 function setObjectXY(obj){
 	var top;
@@ -602,6 +592,16 @@ function clearArrowHint(){
     $("#blackarrowright").css("visibility","hidden");	
 	$("#blackarrowleft").css("visibility","hidden");	
 	
+}
+
+// Up arrow, behaves differently from left/right arrows
+function showUpArrowHint(newLeft) {
+	$("#uparrow").css("margin-left",newLeft - 10); // newLeft minus 1/2 the width of the uparrow image			
+	$("#uparrow").css("visibility","visible");	
+}
+
+function clearUpArrowHint() {
+	$("#uparrow").css("visibility","hidden");	
 }
 
 
