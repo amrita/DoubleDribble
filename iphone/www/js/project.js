@@ -1259,6 +1259,11 @@ function getRandomInteger(min,max)
 
 /********* SECRET CODE **********/
 
+/**
+ * Current behavior: During the game.  Hold the iPhone face-down towards the floor (easiest when you hold it
+ * above your head), then click on the Score.
+ * The alert below should appear.
+ */
 function secretClick() {
 	if (isSecretOn) {
 		alert("Jump to Secret Level!");
