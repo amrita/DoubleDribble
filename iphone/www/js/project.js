@@ -97,7 +97,7 @@ var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 
 // Dunking
-var dunkGForce = 1.5;  // set to 4 to eliminate dunking
+var dunkGForce = 1.5;  // To eliminate dunking, set this value to 4
 
 var accelerometerFrequency = 60;
 var isDunking = false;
@@ -106,6 +106,7 @@ var preDunkGravity;
 var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
 // Secret Presidential Easter Egg
+var secretAvailable = false;
 var isSecretOn = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
@@ -345,10 +346,12 @@ function checkAnswer(X,Y,answer,ball){
 		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
 			bullseyeAnswer(answer);
+			adjustAndGoToNextProblem('bullseye');
 		}
 		else{
 			displayAnswerBoardClose(answerY);
 			closeEnoughAnswer(answer);
+			adjustAndGoToNextProblem('closeEnough');
 		}
 		
 		clearScreenBottom(olddenom);
@@ -394,9 +397,14 @@ function checkAnswer(X,Y,answer,ball){
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
-				showDenominatorHint(answer);
+				if (currentLevelType == 'multiplication') {
+					showArrowHint(X,Y,answer);
+				} else {
+					showDenominatorHint(answer);
+				}
                 break;
 		  case 4:
+				clearArrowHint();
 				showUpArrowHint(answerY);
 				if (numBeginnerProblemsLeft > 0 || currentLevel == 1) {
 					break;
@@ -462,7 +470,6 @@ function setLevelBackgroundImage(num){
 function setBaseboardLimits(bbcolorid){
 	$("#baseMin").text(baseboardMin);
 	$("#baseMax").text(baseboardMax);
-
 	$("#baseMin").css("color",bbcolors[bbcolorid]).fadeIn('slow');
 	$("#baseMax").css("color",bbcolors[bbcolorid]).fadeIn('slow');
 }
@@ -644,7 +651,7 @@ function showDenominatorHint(answer){
 		if (currentLevel < highScaffold || showHint){
 		  //add the hint value below the baseboard 
 		  $("#full-screen-area").append('<div id="hintnumer-' + i + '" class="numerHint">'+ i +'</div>');
-		  $("#full-screen-area").append('<div id="hintline-'  + i + '" class="lineHint"> -- </div>');
+			$("#full-screen-area").append('<div id="hintline-'  + i + '" class="lineHint"> &#151; </div>');
 		  $("#full-screen-area").append('<div id="hintdenom-' + i + '" class="denomHint">'+ denom +'</div>');
 		
 	
@@ -731,55 +738,6 @@ function displayAnswerBoardDeadOn(answerY){
 function clearAnswerBoard(answerY){
 	$("#answerboard").fadeOut('slow');
 }
-
-/*
-//When the screen is tapped the first time pause the game
-//When its tapped again unpause and move to a new problem
-function pauseGame(){
-	
-	// This is to prevent pause from kicking off or overwriting the animationLoop() timer
-	if (gameIsOver) {
-		return;
-	}
-	
-	// if the game isn't paused then pause it
-	if (!gamePaused){
-		gamePaused = true;
-		
-		// Shows pause indicator
-		var pauseMessage = "url('images/pause.png')";
-		$("#pause-indicator").css("background-image", pauseMessage);
-		
-		clearInterval(timerLoop);	
-	}
-	//else restart with a new problem
-	else{
-		//set pause to false
-		gamePaused = false;
-		
-		// erases any baseboard hints
-		clearArrowHint();
-		clearDenominatorHint(currentProblem.denominator);		
-		
-		//get the next problem
-		nextProblem();
-		//compute the answer for this problem
-		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
-		//add scaffolding if needed
-		addScaffolding();
-		
-		//set current try to 0 since we are changing the problem here
-		currentTry = 0;
-		
-		// erases pause indicator
-		var pauseMessage = "url('images/.png')";
-		$("#pause-indicator").css("background-image", pauseMessage);
-				
-		//restarts animation
-		timerLoop = setInterval("animationLoop()", 50);
-	}
-}
-*/
 
 function gameOver(){
 	clearInterval(timerLoop);
@@ -1011,8 +969,6 @@ function bullseyeAnswer(answer)
 		// Then erases it after 1 seconds
 		setTimeout('changeGameMessage("");', 1000)
 	}
-	adjustProblemProbabilities('bullseye');
-	nextProblem();
 }
 
 // Calls the appropriate closeEnough sound and graphic, adjusts the score, and pulls the next problem
@@ -1025,7 +981,10 @@ function closeEnoughAnswer()
 		// Then erases it after 1 seconds
 		setTimeout('changeGameMessage("");', 1000)
 	}
-	adjustProblemProbabilities('closeEnough');
+}
+
+function adjustAndGoToNextProblem(accuracy) {
+	adjustProblemProbabilities(accuracy);
 	nextProblem();
 }
 
@@ -1036,7 +995,7 @@ function playBullseyeSound()
 	playSoundIfSoundIsOn(bullseyeSounds[0]);  // Exposion sound
 	playSoundIfSoundIsOn(bullseyeSounds[random]);  // + random sound = delicious
 	
-	navigator.notification.vibrate(vibrateTime); // TODO: Vibrate does not seem to be working...
+	navigator.notification.vibrate(vibrateTime);
 }
 
 /********* SOUND CODE **********/
@@ -1137,7 +1096,10 @@ function setLevel(level)
 	problemsFinishedThisLevel = 0;
 	
 	if(currentLevel == 9)
-	{ 
+	{	// TODO: put everything related to multiplication here
+		$("#numerator").text("");
+		$("#denominator").text("");
+		$("#baseMax").css("margin-left", "265px");
 		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits(2);
@@ -1360,6 +1322,8 @@ function getRandomInteger(min,max)
  */
 function secretClick() {
 	if (isSecretOn) {
-		alert("Jump to Secret Level!");
+		setLevel(9);
+		restartLevel(9);
+		nextProblem();
 	}
 }

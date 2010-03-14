@@ -248,6 +248,11 @@
 	top: 8px;
 }
 
+#multiplication-problem 
+{
+	top: -4px;
+}
+
 .fraction-text 
 {
 	position: absolute;
