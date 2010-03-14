@@ -10,7 +10,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 2; 
+var skunk = 5; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -18,7 +18,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = false;
+var usingSimulator = false; // TODO: replace w/ try/catch blocks
 
 // The ball in the game
 var ball;
@@ -45,7 +45,6 @@ var bboffset = 10;
 
 //baseboard number colors
 var bbcolors  = ['black','blue','green','purple'];
-var bbcolorid = 0;
 
 var error			 = 4; // error allowed in pixels. 
 var closeEnoughError = 15;
@@ -151,12 +150,10 @@ function gameScreenHasAppeared(event, info)
 	setLevelBackgroundImage(1);
 	
 	//set level parameters
-	setBaseboardLimits();
+	setBaseboardLimits(0);
 	
-	// Initialize problem arrays
-	createFractionProblem2DArray();
-	createMultiplicationProblem2DArray();
-	currentProblem = fractionProblems[2][1];
+	// Initialize the first problem
+	currentProblem = new ProblemObject(1, 2);
 	
 	// Initialize Game sounds
 	initializeGameSounds();
@@ -166,6 +163,8 @@ function gameScreenHasAppeared(event, info)
 	
 	// Add ball to screen after game messages are done
 	setTimeout('addBall();', 4000);
+	
+	firstTimeGame = true;
 }
 
 /******* PREFERENCES CODE *******/
@@ -260,14 +259,10 @@ function startWatchingForShaking() {
 	}
 }
 
-var highestZ = 0.0;
 function accelerometerFired(coords) {
 	if ((horizontalChange > 0.0 && coords.x < 0.0) || (horizontalChange < 0.0 && coords.x > 0.0)) {
 		horizontalChange = coords.x;
 	} else if (dunkGForce < Math.abs(coords.z) && !isDunking && !dunkWait) {
-		if (Math.abs(coords.z) > highestZ) {
-			highestZ = coords.z;
-		}
 		_gravity *= dunkGravityChange;
 		isDunking = true;
 		dunkWait = true;
@@ -293,7 +288,7 @@ function initBaseBoard(){
 function animationLoop()
 {
 	if (gameIsOver) {
-		alert("Shouldn't be called");
+		alert("Please restart the game.\nYou have found 1/4 of the bugs in our game ;P");
 		return;
 	}
 	
@@ -356,13 +351,7 @@ function checkAnswer(X,Y,answer,ball){
 			closeEnoughAnswer(answer);
 		}
 		
-		//clear the display answer board;
-		clearAnswerBoard();
-		//clear any existing hints
-		clearArrowHint();
-		clearUpArrowHint();
-		//clear the number line hints
-		clearDenominatorHint(olddenom);
+		clearScreenBottom(olddenom);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
@@ -393,19 +382,19 @@ function checkAnswer(X,Y,answer,ball){
 			currentTry = 4;
 		}
 		
+		playWrongAnswerSound(Y - answer);
+		
 		//the current try is 
 		switch(currentTry){
 		  case 2:
 				//show hint 
 				showArrowHint(X,Y,answer);
-				playWrongAnswerSound(Y - answer);
                 break;
 		  case 3:
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
 				showDenominatorHint(answer);
-				playWrongAnswerSound(Y - answer);
                 break;
 		  case 4:
 				showUpArrowHint(answerY);
@@ -421,6 +410,16 @@ function checkAnswer(X,Y,answer,ball){
 		  default:
 		}
 	}
+}
+
+function clearScreenBottom(olddenom) {
+	//clear the display answer board;
+	clearAnswerBoard();
+	//clear any existing hints
+	clearArrowHint();
+	clearUpArrowHint();
+	//clear the number line hints
+	clearDenominatorHint(olddenom);
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -459,15 +458,13 @@ function setLevelBackgroundImage(num){
    $("#level-screen").css("background-image",newBg);	
 }
 
-
-function setBaseboardLimits(){
+// pass in different colors when the numbers change
+function setBaseboardLimits(bbcolorid){
 	$("#baseMin").text(baseboardMin);
 	$("#baseMax").text(baseboardMax);
 
 	$("#baseMin").css("color",bbcolors[bbcolorid]).fadeIn('slow');
 	$("#baseMax").css("color",bbcolors[bbcolorid]).fadeIn('slow');
-	
-	bbcolorid++; // change baseboard number colors next time when the numbers change 
 }
 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
@@ -492,11 +489,6 @@ function addScaffolding(){
 
 function addBall()
 {
-	computeBaseboardAnswer(currentProblem.decimalEquivalent,baseboardMin,baseboardMax);
-	
-	displayCurrentProblem();
-	
-	addScaffolding();
 	
 	// Make the ball's background visible
 	var newBg = "url('images/fractionball.png')";
@@ -691,9 +683,8 @@ function showDenominatorHint(answer){
 }
 
 function clearDenominatorHint(denom){
-  //for (i = 1; i <= denom; i++){
 	var i = 1;
-  while ( (i / denom) < baseboardMax){
+	while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
 		$('#hintnumer-' + i).remove();
 		$('#hintline-' + i).remove();
@@ -739,9 +730,9 @@ function displayAnswerBoardDeadOn(answerY){
 // clear the answer board
 function clearAnswerBoard(answerY){
 	$("#answerboard").fadeOut('slow');
-}5
+}
 
-
+/*
 //When the screen is tapped the first time pause the game
 //When its tapped again unpause and move to a new problem
 function pauseGame(){
@@ -788,13 +779,7 @@ function pauseGame(){
 		timerLoop = setInterval("animationLoop()", 50);
 	}
 }
-
-function startGame(){
-	//pick a new problem
-	
-	//start the animation loop again
-	
-}
+*/
 
 function gameOver(){
 	clearInterval(timerLoop);
@@ -809,13 +794,32 @@ function goHome() {
 	jQT.goTo('#home', 'cube'); 
 }
 
+var firstTimeGame = true;
 function restartGame() {
+	
 	$("#game-over").fadeOut('fast');
 	
-	// Set that we're starting the game
-	firstProblemInTheGame = true;
+	// Initialize problem arrays
+	createFractionProblem2DArray();
+	createMultiplicationProblem2DArray();
 	
-	// TODO: Jacob: Reset probabilities
+	if (firstTimeGame) {
+		firstTimeGame = false;
+	} else {
+		// Clean up previous game
+		clearScreenBottom(currentProblem.denominator);
+		
+		currentLevel = 1;
+		baseboardMax = 1;
+		baseboardMin = 0;
+		currentProblem = new ProblemObject(1, 2);
+		getNewProblem();
+	}
+	
+	// Fix up the baseboard
+	computeBaseboardAnswer(currentProblem.decimalEquivalent,baseboardMin,baseboardMax);
+	displayCurrentProblem();
+	addScaffolding();
 	
 	restartLevel(1);
 }
@@ -823,7 +827,7 @@ function restartGame() {
 // This resets all values for a 'new' game.
 function restartLevel(level) {
 	
-	clearUpArrowHint(); // Just in case it's still on
+	clearUpArrowHint(); // Just in case it's still on TODO: DOn't think needed
 	
 	// level is undefined when the UI calls this function
 	if (level == undefined) {
@@ -953,13 +957,13 @@ function getTopForTime() {
 
 /********* LEVEL CODE **********/
 
-// Creating the problemObject 
-function problemObject()
+// Creating the ProblemObject 
+function ProblemObject(numer, denom)
 {
 	this.problemType = 'fraction'; // default is fraction, other types could be fractionAddition, percent, integer, etc
-	this.numerator = 1;
-	this.denominator = 1;
-	this.decimalEquivalent = 1;   // this is the "answer" for this problem, it's decimalEquivalent;
+	this.numerator = numer;
+	this.denominator = denom;
+	this.decimalEquivalent = (numer / denom);   // this is the "answer" for this problem, it's decimalEquivalent;
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
 }
 
@@ -1132,15 +1136,21 @@ function setLevel(level)
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
 	
-	if(currentLevel == 5){
-		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
-		setBaseboardLimits();
-	}   	
-	
-	if(currentLevel == 9){ 
+	if(currentLevel == 9)
+	{ 
 		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
-		setBaseboardLimits();
+		setBaseboardLimits(2);
+	} 
+	else if(currentLevel == 5)
+	{
+		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
+		setBaseboardLimits(1);
+	}
+	else if (currentLevel == 1) 
+	{
+		baseboardMax = 1;
+		setBaseboardLimits(0);
 	}
 	
 	// Changes background to new level background
@@ -1171,6 +1181,7 @@ function changeLevelType(levelType)
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
+		// TODO: should default be fraction?  Otherwise, this will remain when users reset the game
 	}
 }
 
@@ -1182,7 +1193,7 @@ function changeLevelType(levelType)
 
 // Creates the double array that holds all the fraction problems. 
 // fractionProblems uses the syntax [denominator][numerator]
-// For example, fractionProblems[2][1] is where the problemObject 1/2 lives.  
+// For example, fractionProblems[2][1] is where the ProblemObject 1/2 lives.  
 function createFractionProblem2DArray()
 {
 	for(var denom = 1; denom <= highestDenominator[highestLevel]; denom++){   
@@ -1190,17 +1201,14 @@ function createFractionProblem2DArray()
 		
 		for(var numer = 0; numer <= (denom * baseboardMaxPotential); numer++) // this stops fraction being created that are larger than the baseboard
 		{ 			
-			fractionProblems[denom][numer] = new problemObject(); 
-			fractionProblems[denom][numer].numerator = numer; 
-			fractionProblems[denom][numer].denominator = denom;
-			fractionProblems[denom][numer].decimalEquivalent = (numer / denom);
+			fractionProblems[denom][numer] = new ProblemObject(numer, denom); 
 			
 			if(numer == 0){   
 				fractionProblems[denom][numer].probability = .3;  // sets lower probabilities for 0 in the numerator
 			} else if (numer == denom){  
 				fractionProblems[denom][numer].probability = .3;  // sets lower probabilities for all fractions = 1
 			} else if (numer == 1){
-				fractionProblems[denom][numer].probability = .1;  // sets high probability for when numer = 1
+				fractionProblems[denom][numer].probability = .6;  // sets high probability for when numer = 1
 			} else {
 				fractionProblems[denom][numer].probability = .5;  // the rest are defaulted to .5 probability
 			}			
@@ -1217,7 +1225,7 @@ function createMultiplicationProblem2DArray()
 		
 		for(var secondNum = 0; secondNum <= highestMultiplier; secondNum++){
 			
-			multiplicationProblems[firstNum][secondNum] = new problemObject();
+			multiplicationProblems[firstNum][secondNum] = new ProblemObject();
 			multiplicationProblems[firstNum][secondNum].problemType = 'multiplication'; 
 			multiplicationProblems[firstNum][secondNum].numerator = firstNum; 
 			// Note that this is a hacky misnomer. We are storing the first number of the multiplication problem as the "numerator". Sorry, God. 
@@ -1228,16 +1236,6 @@ function createMultiplicationProblem2DArray()
 	}
 }
 
-
-// Initializes the probabilities for each of the fractions up to denom level 5 - the rest are defaulted to 
-function initializeProbabilities()
-{
-	// emptied out b/c these are now set inside createFractionProblem2DArray
-}
-
-
-
-
 // Adjusts the problem and related problem probabilties based on accuracy 
 // and creates and displays a new problem  
 function nextProblem()
@@ -1245,14 +1243,14 @@ function nextProblem()
 	streakCounter++;
 	currentTry = 1;
 	
-	if(streakCounter >= skunk){
+	if(streakCounter >= skunk)
+	{
 		increaseScore(50);
 		bonusGraphic();
 		nextLevel();		
-	}
-	
-	problemsFinishedThisLevel++;
-	if(problemsFinishedThisLevel >= numProblemsPerLevel){
+	} 
+	else if(++problemsFinishedThisLevel >= numProblemsPerLevel)
+	{
 		nextLevel();
 	}
 	
@@ -1328,8 +1326,6 @@ function displayCurrentProblem()
 {
 	switch(currentProblem.problemType){
 		case 'fraction':
-			//var fractionString = currentProblem.numerator + "/" + currentProblem.denominator;
-			//$("#current-problem").text(fractionString);
 			$("#numerator").text(currentProblem.numerator);
 			$("#denominator").text(currentProblem.denominator);
 			break;
