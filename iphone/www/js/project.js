@@ -177,6 +177,11 @@ function loadSettingsForGame() {
 	}
 	
 	// Gravity Change
+	if (localStorage.skunk != null) {
+		skunk = localStorage.skunk;
+	}
+	
+	// Gravity Change
 	if (localStorage.gravityChange != null) {
 		setGravityChange(localStorage.gravityChange);
 	}
@@ -194,6 +199,12 @@ function loadSettingsScreen() {
 		localStorage.gravity = INIT_GRAVITY;
 	}
     $("#gravity").val([localStorage.gravity]);
+	
+	// Skunk value
+	if (localStorage.skunk == null) {
+		localStorage.skunk = skunk;
+	}
+	$("#skunk").val([localStorage.skunk]);
 	
 	// Gravity Change
 	if (localStorage.gravityChange == null) {
@@ -217,11 +228,16 @@ function saveSettings() {
 	isSoundOn = $("#sound").is(":checked");
 	localStorage.sound = isSoundOn;
 	
+	// Skunk
+	var skunkVal = $("#skunk").val();
+	skunk = parseInt(skunkVal);
+    localStorage.skunk = skunk;
+	
 	// Gravity
 	INIT_GRAVITY = parseFloat($("#gravity").val());
     localStorage.gravity = INIT_GRAVITY;
 	
-	// Gravity
+	// Gravity change
 	var gravChange = $("#gravity-change").val();
 	setGravityChange(gravChange);
     localStorage.gravityChange = gravChange;
@@ -420,16 +436,6 @@ function checkAnswer(X,Y,answer,ball){
 	}
 }
 
-function clearScreenBottom(olddenom) {
-	//clear the display answer board;
-	clearAnswerBoard();
-	//clear any existing hints
-	clearArrowHint();
-	clearUpArrowHint();
-	//clear the number line hints
-	clearDenominatorHint(olddenom);
-}
-
 //set the current x,y co-ordinates of the ball 
 function setObjectXY(obj){
 	var top;
@@ -590,6 +596,18 @@ function showArrowHint(X,Y,answer){
 	
 }
 
+/********* CLEAR HINTS/SCAFFOLDING CODE **********/
+
+function clearScreenBottom(olddenom) {
+	//clear the display answer board;
+	clearAnswerBoard();
+	//clear any existing hints
+	clearArrowHint();
+	clearUpArrowHint();
+	//clear the number line hints
+	clearDenominatorHint(olddenom);
+}
+
 function clearArrowHint(){
     $("#blackarrowright").css("visibility","hidden");	
 	$("#blackarrowleft").css("visibility","hidden");	
@@ -689,6 +707,9 @@ function showDenominatorHint(answer){
 	} //while ends 
 }
 
+/**
+ * TODO: if we put all hints into the same class, would it erase all of them with a single "remove()"?
+ */
 function clearDenominatorHint(denom){
 	var i = 1;
 	while ( (i / denom) < baseboardMax){
@@ -749,7 +770,9 @@ function gameOver(){
 }
 
 function goHome() {
-	jQT.goTo('#home', 'cube'); 
+	clearScreenBottom(currentProblem.denominator);
+	$("#game-over").fadeOut('fast');
+	setTimeout("jQT.goTo('#home', 'cube');", 100);
 }
 
 var firstTimeGame = true;
