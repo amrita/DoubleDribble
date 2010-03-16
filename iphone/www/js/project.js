@@ -1182,6 +1182,10 @@ function changeLevelType(levelType)
 			var newBg = "url('images/plainball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
+		case 'presidential':
+			var newBg = "url('images/Obama.png')";
+			$(".ballClass").css("background-image", newBg);
+			break;
 		case 'sqroot':
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
@@ -1388,3 +1392,7 @@ function secretClick() {
 		nextProblem();
 	}
 }
+
+
+
+
