@@ -257,21 +257,22 @@ function setGravityChange(changeValue) {
 /******* ACCELEROMETER CODE *******/
 var accelerometerStarted = false;
 function startWatchingForShaking() {
-	if (usingSimulator) {
-		return;
-	}
-	
-	var win = function(coords){
-		accelerometerFired(coords); 		
-	};
-	var fail = function(){};
-	var options = {};
-	options.frequency = accelerometerFrequency;
-	
-	// This is so we don't start multiple accelerometer callbacks
-	if (!accelerometerStarted) {
-		navigator.accelerometer.watchAcceleration(win, fail, options);
-		accelerometerStarted = true;
+	try {
+		var win = function(coords){
+			accelerometerFired(coords); 		
+		};
+		var fail = function(){};
+		var options = {};
+		options.frequency = accelerometerFrequency;
+		
+		// This is so we don't start multiple accelerometer callbacks
+		if (!accelerometerStarted) {
+			navigator.accelerometer.watchAcceleration(win, fail, options);
+			accelerometerStarted = true;
+		}
+	} catch (exception) {
+		// if there's an error, we're on the simulator
+		usingSimulator = true;
 	}
 }
 
@@ -405,8 +406,12 @@ function checkAnswer(X,Y,answer,ball){
 		//the current try is 
 		switch(currentTry){
 		  case 2:
-				//show hint 
-				showArrowHint(X,Y,answer);
+				//show hint
+				if (currentLevelType == 'presidential') {
+					showPresidentName();
+				} else {
+					showArrowHint(X,Y,answer);
+				}
                 break;
 		  case 3:
 				//clear any previous hints
@@ -414,6 +419,9 @@ function checkAnswer(X,Y,answer,ball){
 				//show hint 
 				if (currentLevelType == 'multiplication') {
 					showArrowHint(X,Y,answer);
+				} else if (currentLevelType == 'presidential') {
+					showArrowHint(X,Y,answer);
+					showPresidentName();
 				} else {
 					showDenominatorHint(answer);
 				}
@@ -554,6 +562,13 @@ function changeGameMessage(imageName)
 {
 	var newMessage = "url('images/" + imageName + ".png')";
 	$("#game-messageboard").css("background-image",newMessage);
+}
+
+
+/********* SHOW HINTS/SCAFFOLDING CODE **********/
+
+function showPresidentName() {
+	// TODO: implement
 }
 
 // show either the left or the right hint arrow based on the position
