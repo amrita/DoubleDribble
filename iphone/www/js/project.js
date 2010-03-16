@@ -92,7 +92,7 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = [Obama];
+var presidentialNames = ['Obama'];
 var presidentialYearsElected = [2008];
 
 var wrongAnswerSounds = new Array();
@@ -478,7 +478,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelBackgroundImage(num){
-	num = Math.min(num, 17); // prevents going past the levels we have
+	// num = Math.min(num, 17); // prevents going past the levels we have, commented out b/c no one's going that high currently
 	var newBg = "url('images/level" + num + "bg.png')";
    $("#level-screen").css("background-image",newBg);	
 }
@@ -801,7 +801,7 @@ function restartGame() {
 	// Initialize problem arrays
 	createFractionProblem2DArray();
 	createMultiplicationProblem2DArray();
-	createPresidentialProblemArray();
+	//createPresidentialProblemArray();
 	
 	if (firstTimeGame) {
 		firstTimeGame = false;
@@ -965,7 +965,7 @@ function ProblemObject(numer, denom)
 	this.denominator = denom;
 	this.decimalEquivalent = (numer / denom);   // this is the "answer" for this problem, it's decimalEquivalent;
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
-	this.name = ""; // a placeholder for Presidential names and other labels. 
+	this.problemLabel = ""; // a placeholder for Presidential names and other labels. 
 }
 
 
@@ -1157,6 +1157,16 @@ function setLevel(level)
 		baseboardMax = 1;
 		setBaseboardLimits(0);
 	}
+	else if(currentLevel == 20)  // presidential
+	{
+		$("#numerator").text("");
+		$("#denominator").text("");
+		$("#baseMax").css("margin-left", "265px");
+		changeLevelType('presidential');
+		baseboardMax = 2010;
+		baseboardMin = 1900;
+		setBaseboardLimits(3);
+	}
 	
 	// Changes background to new level background
 	setLevelBackgroundImage(currentLevel);
@@ -1185,6 +1195,7 @@ function changeLevelType(levelType)
 		case 'presidential':
 			var newBg = "url('images/Obama.png')";
 			$(".ballClass").css("background-image", newBg);
+			$("#multiplication-problem").fadeOut('fast'); // clears the multiplication prob off Obama's face
 			break;
 		case 'sqroot':
 			var newBg = "url('images/sqrootball.png')";
@@ -1349,7 +1360,7 @@ function displayCurrentProblem()
 
 
 //
-// Presidential mode
+//  Presidential Mode
 // 
 //
 
@@ -1359,7 +1370,7 @@ function createPresidentialProblemArray()
 	for(i = 0; i < presidentialNames.length; i++){
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
 		presidentialProblems[i] = ProblemObject(presidentialYearsElected[i],1); 
-		presidentialProblems[i].name = presidentialNames[i];
+		presidentialProblems[i].problemLabel = presidentialNames[i];
 		presidentialProblems[i].problemType = 'presidential';
 	}
 }
@@ -1386,7 +1397,13 @@ function getRandomInteger(min,max)
  * The alert below should appear.
  */
 function secretClick() {
-	if (isSecretOn) {
+	if (isSecretOn && (currentLevelType == 'multiplication')) {
+		alert('prez!');
+		setLevel(20);
+		restartLevel(20);
+		nextProblem();
+	}
+	else if (isSecretOn) {
 		setLevel(9);
 		restartLevel(9);
 		nextProblem();
