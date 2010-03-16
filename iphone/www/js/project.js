@@ -106,7 +106,6 @@ var preDunkGravity;
 var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
 // Secret Presidential Easter Egg
-var secretAvailable = false;
 var isSecretOn = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
