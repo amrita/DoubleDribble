@@ -101,6 +101,7 @@ var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
 var multiplicationLevelSound;
 var presidentialLevelSound;
+var gameOverSound;
 
 // Dunking
 var dunkGForce = 1.5;  // To eliminate dunking, set this value to 4
@@ -813,6 +814,7 @@ function clearAnswerBoard(answerY){
 function gameOver(){
 	clearInterval(timerLoop);
 	
+	playSoundIfSoundIsOn(gameOverSound);
 	$("#game-over").css("visibility", "visible");
 	$("#game-over").fadeIn("slow");
 	
@@ -1031,6 +1033,8 @@ function initializeGameSounds()
 	
 	presidentialLevelSound = new Media("www/sounds/hailtothechief.wav");
 	multiplicationLevelSound = new Media("www/sounds/mollusk.wav");
+	
+	gameOverSound = new Media("www/sounds/gameoversound.wav");
 }
 
 //
