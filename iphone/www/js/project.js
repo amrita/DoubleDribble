@@ -92,8 +92,8 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = ["Obama"];
-var presidentialYearsElected = [2008];
+var presidentialNames = ["Roosevelt", "Eisenhower", "Kennedy", "Nixon", "Clinton", "Obama"];
+var presidentialYearsElected = [1932, 1952, 1960, 1968, 1992, 2008];
 
 var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
@@ -1217,7 +1217,7 @@ function setLevel(level)
 		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
 		baseboardMax = 2010;
-		baseboardMin = 1900;
+		baseboardMin = 1910;
 		setBaseboardLimits(3);
 	}
 
