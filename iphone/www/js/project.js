@@ -65,7 +65,7 @@ var vibrateTime = 600;
 var gameIsOver = true;
 
 // whether or not the player is playing the first problem in the game
-var numBeginnerProblems = 0;
+var numBeginnerProblems = 5;
 var numBeginnerProblemsLeft = numBeginnerProblems;
 
 var currentLevel = 1;    // Tracks the player's current level
@@ -92,8 +92,8 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = ["Obama"];
-var presidentialYearsElected = [2008];
+var presidentialNames = ["Roosevelt", "Eisenhower", "Kennedy", "Nixon", "Clinton", "Obama"];
+var presidentialYearsElected = [1932, 1952, 1960, 1968, 1992, 2008];
 
 var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
@@ -377,16 +377,16 @@ function checkAnswer(X,Y,answer,ball){
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
-		//reset current try to 0
-		currentTry = 0;
-		
 		if (currentTry == 1) {
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
+		//reset current try to 0
+		currentTry = 0;
 		numBeginnerProblemsLeft--;
+		
 	} else {
-		//increment the number of tries 
+		//increment the number of tries if not correct
 		currentTry++;
 		
 		if (currentTry > 0){
@@ -395,9 +395,10 @@ function checkAnswer(X,Y,answer,ball){
 		}
 		
 		streakCounter = 0;
-		adjustProblemProbabilities('wrong');
+			
+		if(currentLevelType == 'fraction'){adjustProblemProbabilities('wrong');}
 		
-		// The first numBeginnerProblems times the user has infinite tries
+		// The first numBeginnerProblems times we keep resetting the currentTry to 4, so the user has infinite tries
 		if (numBeginnerProblemsLeft > 0 && currentTry > 4) {
 			currentTry = 4;
 		}
@@ -440,6 +441,7 @@ function checkAnswer(X,Y,answer,ball){
 				gameOver();	
 				break;
 		  default:
+				alert("Please restart the game.\nYou have found 1/5 of the bugs in our game :P");
 		}
 	}
 }
@@ -1214,7 +1216,7 @@ function setLevel(level)
 		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
 		baseboardMax = 2010;
-		baseboardMin = 1900;
+		baseboardMin = 1910;
 		setBaseboardLimits(3);
 	}
 
@@ -1255,9 +1257,11 @@ function changeLevelType(levelType)
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
-		// TODO: should default be fraction?  Otherwise, this will remain when users reset the game
+		
 	}
 }
+
+// currentProblem.problemLabel.replace(' ', '_') + ".png"
 
 
 //
