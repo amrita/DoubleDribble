@@ -1013,10 +1013,9 @@ function initializeGameSounds()
 	bullseyeSounds[10] = new Media("www/sounds/sublime.wav");
 	bullseyeSounds[11] = new Media("www/sounds/flawless.wav");
 	
-	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 	
-	secretLevelSound = bullseyeSounds[10];
+	secretLevelSound = new Media("www/sounds/hailtothechief.wav");
 }
 
 //

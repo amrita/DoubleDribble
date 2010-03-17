@@ -51,15 +51,8 @@
 }
 
 #contactus{
-  margin-top:  0px;
-	margin-left: 100px;
-	
-	font-family: Helvetica;
-	font-size: 20pt;
-	font-weight: bold;
-	text-align: center;
-	color: white;
-	
+	top:  8px;
+	left: 265px;
 	position: absolute;
 }
 
