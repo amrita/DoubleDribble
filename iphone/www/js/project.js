@@ -18,7 +18,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = false; // TODO: replace w/ try/catch blocks
+var usingSimulator = true; // TODO: replace w/ try/catch blocks
 
 // The ball in the game
 var ball;
@@ -92,7 +92,7 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = [Obama];
+var presidentialNames = ["Obama"];
 var presidentialYearsElected = [2008];
 
 var wrongAnswerSounds = new Array();
@@ -410,14 +410,21 @@ function checkAnswer(X,Y,answer,ball){
 		//the current try is 
 		switch(currentTry){
 		  case 2:
-				//show hint 
-				showArrowHint(X,Y,answer);
+				//show hint
+				if (currentLevel == 'presidential') {
+					showPresidentName();
+				} else {
+					showArrowHint(X,Y,answer);
+				}
                 break;
 		  case 3:
 				//clear any previous hints
 				clearArrowHint();
 				//show hint 
 				if (currentLevelType == 'multiplication') {
+					showArrowHint(X,Y,answer);
+				} else if (currentLevel == 'presidential') {
+					showPresidentName();
 					showArrowHint(X,Y,answer);
 				} else {
 					showDenominatorHint(answer);
@@ -438,6 +445,11 @@ function checkAnswer(X,Y,answer,ball){
 		  default:
 		}
 	}
+}
+
+// TODO: Move this to an appropriate location before checking in
+function showPresidentName() {
+	// TODO: implement
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -787,7 +799,7 @@ function restartGame() {
 	// Initialize problem arrays
 	createFractionProblem2DArray();
 	createMultiplicationProblem2DArray();
-	createPresidentialProblemArray();
+	//createPresidentialProblemArray();
 	
 	if (firstTimeGame) {
 		firstTimeGame = false;
