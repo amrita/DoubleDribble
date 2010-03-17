@@ -1500,7 +1500,7 @@ function displayScoreBoard(){
 	
 	//if the localStorage variables don't exist create them
 	if (!(localStorage.getItem("nscores"))){
-		alert("creating nscores");
+		//alert("creating nscores");
 		localStorage.setItem("nscores", 0);
 	}
 	
@@ -1511,7 +1511,7 @@ function displayScoreBoard(){
 		nscores++; //increment nscores
 		var itemstr = "scores" + nscores;
     localStorage.setItem(itemstr, playerScore);
-		alert(localStorage.getItem(itemstr));
+		//alert(localStorage.getItem(itemstr));
 	}
   else{
 		//add to the 1st position, use as a place holder
@@ -1589,13 +1589,20 @@ function displayModalWindow(){
 	//add score to the window
 	$('#mask').append('<div id="highscores" class="scoretext">High Scores</div><br/><br/>');
 	
-	//scores
-	$('#mask').append('<div id="scores6" class="scoretext">' + localStorage.getItem("scores6") +'</div>');
-	$('#mask').append('<div id="scores5" class="scoretext">' + localStorage.getItem("scores5") +'</div>');
-	$('#mask').append('<div id="scores4" class="scoretext">' + localStorage.getItem("scores4") +'</div>');
-	$('#mask').append('<div id="scores3" class="scoretext">' + localStorage.getItem("scores3") +'</div>');
-	$('#mask').append('<div id="scores2" class="scoretext">' + localStorage.getItem("scores2") +'</div>');
-												 
+	var nscores = localStorage.getItem("nscores");
+	if (nscores <= 5){
+		for (i = nscores; i >= 1; i--){
+	    //scores
+		  $('#mask').append('<div id="scores' + i +'" class="scoretext">' + localStorage.getItem("scores" + i) +'</div>');	
+		}
+	}
+	else{
+	  for (i = nscores; i > 1; i--){
+	    //scores
+		  $('#mask').append('<div id="scores' + i +'" class="scoretext">' + localStorage.getItem("scores" + i) +'</div>');	
+	  }
+  }
+	
 };  
 
 //if close button is clicked 
