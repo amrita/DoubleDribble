@@ -1243,9 +1243,11 @@ function changeLevelType(levelType)
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
-		// TODO: should default be fraction?  Otherwise, this will remain when users reset the game
+		
 	}
 }
+
+// currentProblem.problemLabel.replace(' ', '_') + ".png"
 
 
 //
