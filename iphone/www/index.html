@@ -40,15 +40,13 @@
 				<!--div id="test">test</div -->
 				<div id="score" onclick="secretClick();">0 pts</div>
 				<div id="pause-indicator"></div>
-				<div id="game-over">
-					<h2>Game Over</h2>
-					<div id="game-over-buttons">
-						<input type="button" value="Restart Level" onclick="restartLevel();" /><br />
-						<input type="button" value="Restart Game" onclick="restartGame();" /><br />
-						<input type="button" value="Home Screen" onclick="goHome();" />
-					</div>
-				</div>
 				<div id="game-messageboard"></div>
+				<div id="game-over">
+					<div id="game-over-graphic"></div>
+					<div id="restart-level" onclick="restartLevel();"><img src="images/restartlevel.png"/></div>
+					<div id="restart-game" onclick="restartGame();"><img src="images/restartgame.png"/></div>
+					<div id="go-home" onclick="goHome();"><img src="images/homescreen.png"/></div>
+				</div>
 				<div id="ball" class="ballClass">
 				  <div id="numerator" class="fraction-text"></div>
 				  <div id="denominator" class="fraction-text"></div>
@@ -110,7 +108,7 @@
 	<!-- About screen -->	
 	<div id="about">
 		<div id="aboutback" onclick="jQT.goBack('#home', 'cube')"><img src="images/aboutback.png" alt="Back"/></div>
-		<div id="contactus" onclick="sendMail();">Contact Us</div>
+		<div id="contactus" onclick="sendMail();"><img src="images/contactus.png"/></div>
 	</div>
 	
 </body>

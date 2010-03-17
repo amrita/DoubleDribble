@@ -65,7 +65,7 @@ var vibrateTime = 600;
 var gameIsOver = true;
 
 // whether or not the player is playing the first problem in the game
-var numBeginnerProblems = 5;
+var numBeginnerProblems = 0;
 var numBeginnerProblemsLeft = numBeginnerProblems;
 
 var currentLevel = 1;    // Tracks the player's current level
@@ -818,14 +818,14 @@ function gameOver(){
 
 function goHome() {
 	clearScreenBottom(currentProblem.denominator);
-	$("#game-over").fadeOut('fast');
+	$("#game-over").css("visibility", "hidden");
 	setTimeout("jQT.goTo('#home', 'cube');", 100);
 }
 
 var firstTimeGame = true;
 function restartGame() {
 	
-	$("#game-over").fadeOut('fast');
+	$("#game-over").css("visibility", "hidden");
 	
 	// Initialize problem arrays
 	createFractionProblem2DArray();
@@ -861,7 +861,7 @@ function restartLevel(level) {
 	// level is undefined when the UI calls this function
 	if (level == undefined) {
 		level = currentLevel;
-		$("#game-over").fadeOut('fast');
+		$("#game-over").css("visibility", "hidden");
 	}
 	
 	setScore(0);
@@ -1024,10 +1024,9 @@ function initializeGameSounds()
 	bullseyeSounds[10] = new Media("www/sounds/sublime.wav");
 	bullseyeSounds[11] = new Media("www/sounds/flawless.wav");
 	
-	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 	
-	secretLevelSound = bullseyeSounds[10];
+	secretLevelSound = new Media("www/sounds/hailtothechief.wav");
 }
 
 //
@@ -1206,6 +1205,9 @@ function setLevel(level)
 	}
 	else if (currentLevel == 20)  // presidential
 	{
+		// moves message div up to above the White House
+		$("#game-messageboard").css("top","80px");
+		
 		$("#numerator").text("");
 		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "275px");
@@ -1221,9 +1223,11 @@ function setLevel(level)
 	setLevelBackgroundImage(currentLevel);
 	
 	var gameMessageTime = 3000; 
-	
-	if((currentLevel != 1) && (currentLevel < 20)){
-		// Changes Game Message, except for first level
+	if(currentLevel == 20){gameMessageTime = 7000;}  // more time for Prez level
+	if(currentLevel == 5 || currentLevel == 9){gameMessageTime = 5000;}  // more time for levels with new paradigms
+
+	// Changes Game Message, except for first level
+	if(currentLevel != 1){
 		var messageImageName = "messagelevel" + currentLevel;
 		changeGameMessage(messageImageName);
 		// Then erases it after 3 seconds, 7 if in President's mode
@@ -1451,7 +1455,7 @@ function getRandomInteger(min,max)
  * The alert below should appear.
  */
 function secretClick() {
-	
+
 	if (gameIsOver) {
 		return;
 	} else if (isSecretOn) {
