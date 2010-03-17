@@ -377,16 +377,16 @@ function checkAnswer(X,Y,answer,ball){
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
-		//reset current try to 0
-		currentTry = 0;
-		
 		if (currentTry == 1) {
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
+		//reset current try to 0
+		currentTry = 0;
 		numBeginnerProblemsLeft--;
+		
 	} else {
-		//increment the number of tries 
+		//increment the number of tries if not correct
 		currentTry++;
 		
 		if (currentTry > 0){
@@ -395,9 +395,10 @@ function checkAnswer(X,Y,answer,ball){
 		}
 		
 		streakCounter = 0;
-		adjustProblemProbabilities('wrong');
+			
+		if(currentLevelType == 'fraction'){adjustProblemProbabilities('wrong');}
 		
-		// The first numBeginnerProblems times the user has infinite tries
+		// The first numBeginnerProblems times we keep resetting the currentTry to 4, so the user has infinite tries
 		if (numBeginnerProblemsLeft > 0 && currentTry > 4) {
 			currentTry = 4;
 		}
@@ -440,6 +441,7 @@ function checkAnswer(X,Y,answer,ball){
 				gameOver();	
 				break;
 		  default:
+				alert("Please restart the game.\nYou have found 1/5 of the bugs in our game :P");
 		}
 	}
 }
