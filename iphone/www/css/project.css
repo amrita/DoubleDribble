@@ -96,10 +96,9 @@
 
 #baseboard-message {
 	position: absolute;
-	top: 460px;
+	top: 435px;
 	width: 320px;
 	height: 20px;
-	text-align: center;
 }
 
 .dHint

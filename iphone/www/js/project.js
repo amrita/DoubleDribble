@@ -18,7 +18,7 @@ var INIT_GRAVITY = 0.15;
 var GRAVITY_CHANGE = .001;
 
 // Set this to true if you're using the iPhone Simulator
-var usingSimulator = true; // TODO: replace w/ try/catch blocks
+var usingSimulator = false; // TODO: replace w/ try/catch blocks
 
 // The ball in the game
 var ball;
@@ -110,7 +110,6 @@ var preDunkGravity;
 var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
 
 // Secret Presidential Easter Egg
-var secretAvailable = false;
 var isSecretOn = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
@@ -262,21 +261,22 @@ function setGravityChange(changeValue) {
 /******* ACCELEROMETER CODE *******/
 var accelerometerStarted = false;
 function startWatchingForShaking() {
-	if (usingSimulator) {
-		return;
-	}
-	
-	var win = function(coords){
-		accelerometerFired(coords); 		
-	};
-	var fail = function(){};
-	var options = {};
-	options.frequency = accelerometerFrequency;
-	
-	// This is so we don't start multiple accelerometer callbacks
-	if (!accelerometerStarted) {
-		navigator.accelerometer.watchAcceleration(win, fail, options);
-		accelerometerStarted = true;
+	try {
+		var win = function(coords){
+			accelerometerFired(coords); 		
+		};
+		var fail = function(){};
+		var options = {};
+		options.frequency = accelerometerFrequency;
+		
+		// This is so we don't start multiple accelerometer callbacks
+		if (!accelerometerStarted) {
+			navigator.accelerometer.watchAcceleration(win, fail, options);
+			accelerometerStarted = true;
+		}
+	} catch (exception) {
+		// if there's an error, we're on the simulator
+		usingSimulator = true;
 	}
 }
 
@@ -411,7 +411,7 @@ function checkAnswer(X,Y,answer,ball){
 		switch(currentTry){
 		  case 2:
 				//show hint
-				if (currentLevel == 'presidential') {
+				if (currentLevelType == 'presidential') {
 					showPresidentName();
 				} else {
 					showArrowHint(X,Y,answer);
@@ -423,7 +423,7 @@ function checkAnswer(X,Y,answer,ball){
 				//show hint 
 				if (currentLevelType == 'multiplication') {
 					showArrowHint(X,Y,answer);
-				} else if (currentLevel == 'presidential') {
+				} else if (currentLevelType == 'presidential') {
 					showPresidentName();
 					showArrowHint(X,Y,answer);
 				} else {
@@ -483,7 +483,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 }
 
 function setLevelBackgroundImage(num){
-	num = Math.min(num, 17); // prevents going past the levels we have
+	// num = Math.min(num, 17); // prevents going past the levels we have, commented out b/c no one's going that high currently
 	var newBg = "url('images/level" + num + "bg.png')";
    $("#level-screen").css("background-image",newBg);	
 }
@@ -571,6 +571,13 @@ function changeGameMessage(imageName)
 {
 	var newMessage = "url('images/" + imageName + ".png')";
 	$("#game-messageboard").css("background-image",newMessage);
+}
+
+
+/********* SHOW HINTS/SCAFFOLDING CODE **********/
+
+function showPresidentName() {
+	$("#baseboard-message").text(currentProblem.problemLabel);
 }
 
 // show either the left or the right hint arrow based on the position
@@ -963,7 +970,7 @@ function ProblemObject(numer, denom)
 	this.denominator = denom;
 	this.decimalEquivalent = (numer / denom);   // this is the "answer" for this problem, it's decimalEquivalent;
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
-	this.name = ""; // a placeholder for Presidential names and other labels. 
+	this.problemLabel = ""; // a placeholder for Presidential names and other labels. 
 }
 
 
@@ -1155,6 +1162,16 @@ function setLevel(level)
 		baseboardMax = 1;
 		setBaseboardLimits(0);
 	}
+	else if(currentLevel == 20)  // presidential
+	{
+		$("#numerator").text("");
+		$("#denominator").text("");
+		$("#baseMax").css("margin-left", "265px");
+		changeLevelType('presidential');
+		baseboardMax = 2010;
+		baseboardMin = 1900;
+		setBaseboardLimits(3);
+	}
 	
 	// Changes background to new level background
 	setLevelBackgroundImage(currentLevel);
@@ -1179,6 +1196,11 @@ function changeLevelType(levelType)
 		case 'multiplication':
 			var newBg = "url('images/plainball.png')";
 			$(".ballClass").css("background-image", newBg);
+			break;
+		case 'presidential':
+			var newBg = "url('images/Obama.png')";
+			$(".ballClass").css("background-image", newBg);
+			$("#multiplication-problem").fadeOut('fast'); // clears the multiplication prob off Obama's face
 			break;
 		case 'sqroot':
 			var newBg = "url('images/sqrootball.png')";
@@ -1343,7 +1365,7 @@ function displayCurrentProblem()
 
 
 //
-// Presidential mode
+//  Presidential Mode
 // 
 //
 
@@ -1353,7 +1375,7 @@ function createPresidentialProblemArray()
 	for(i = 0; i < presidentialNames.length; i++){
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
 		presidentialProblems[i] = ProblemObject(presidentialYearsElected[i],1); 
-		presidentialProblems[i].name = presidentialNames[i];
+		presidentialProblems[i].problemLabel = presidentialNames[i];
 		presidentialProblems[i].problemType = 'presidential';
 	}
 }
@@ -1380,9 +1402,19 @@ function getRandomInteger(min,max)
  * The alert below should appear.
  */
 function secretClick() {
-	if (isSecretOn) {
+	if (isSecretOn && (currentLevelType == 'multiplication')) {
+		alert('prez!');
+		setLevel(20);
+		restartLevel(20);
+		nextProblem();
+	}
+	else if (isSecretOn) {
 		setLevel(9);
 		restartLevel(9);
 		nextProblem();
 	}
 }
+
+
+
+
