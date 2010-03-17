@@ -1322,7 +1322,7 @@ function nextProblem()
 		bonusGraphic();
 		nextLevel();
 	} 
-	else if(++problemsFinishedThisLevel >= numProblemsPerLevel)
+	else if(++problemsFinishedThisLevel >= numProblemsPerLevel || secretWaiting)
 	{
 		nextLevel();
 	}
