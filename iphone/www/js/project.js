@@ -10,7 +10,7 @@ var jQT = new $.jQTouch({
 //GLOBAL VARIABLES
 
 // The number of continuous answers needed to skunk a level
-var skunk = 5; 
+var skunk = 2; 
 
 // Initial gravity for the app. For dynamic gravity changes use changeGravity()
 var INIT_GRAVITY = 0.15;
@@ -439,7 +439,7 @@ function checkAnswer(X,Y,answer,ball){
 		  case 5:
 				currentTry = 1;	
 				clearArrowHint();
-				displayAnswerBoardDeadOn(answerY);
+				displayAnswerBoardGameOver(answerY);
 				gameOver();	
 				break;
 		  default:
@@ -708,14 +708,14 @@ function showDenominatorHint(answer){
 		    nHint.css("margin-left",answer - 10);
 			}
 			else{
-				nHint.css("margin-left",answer - 7);
+				nHint.css("margin-left",answer - 8);
 			}
-		  lHint.css("margin-left",answer - 6);
+		  lHint.css("margin-left",answer - 8);
 			if (denom > 10){
 		    dHint.css("margin-left",answer - 10);
 			}
 			else{
-				dHint.css("margin-left",answer - 7);
+				dHint.css("margin-left",answer - 8);
 			}
 		}
 		
@@ -777,6 +777,23 @@ function displayAnswerBoardDeadOn(answerY){
   
 }
 
+// if the correct answer was selected then light up the board 
+function displayAnswerBoardGameOver(answerY){
+	
+	//set the newWidth to where the correct answer point is
+	var newWidth = answerY - bboffset;
+	
+	//special case for when the answer is 0. Set pixel width to 2 to display
+  //the answer. 
+	if (newWidth == 0) newWidth = 2;
+	
+	$("#answerboard").css("background-color","#878185");
+	$("#answerboard").css("width",newWidth);
+	
+	//make it visible 
+	$("#answerboard").fadeIn('fast');
+  
+}
 
 // clear the answer board
 function clearAnswerBoard(answerY){
@@ -1173,7 +1190,7 @@ function setLevel(level)
 	{
 		$("#numerator").text("");
 		$("#denominator").text("");
-		$("#baseMax").css("margin-left", "265px");
+		$("#baseMax").css("margin-left", "275px");
 		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
 		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
@@ -1387,12 +1404,13 @@ function displayCurrentProblem()
 
 function createPresidentialProblemArray()
 {
-	/* for(i = 0; i < presidentialNames.length; i++){
+	 for(i = 0; i < presidentialNames.length; i++){
+		 
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
-		presidentialProblems[i] = ProblemObject(presidentialYearsElected[i],1); 
+		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
 		presidentialProblems[i].problemLabel = presidentialNames[i];
-		presidentialProblems[i].problemType = 'presidential';
-	}  */
+		presidentialProblems[i].problemType = 'presidential';   
+	} 
 }
 
 
@@ -1429,6 +1447,11 @@ function secretClick() {
 	}
 }
 
+/* EMAIL FUNCTION */
+function sendMail()
+{ 
+	document.location.href = "mailto:doubledribblegame@gmail.com?subject=Contact Us &body="; 
+}
 
 
 
