@@ -92,13 +92,16 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = ["Obama"];
-var presidentialYearsElected = [2008];
+var presidentialNames = ["Roosevelt", "Eisenhower", "Kennedy", "Nixon", "Clinton", "Obama"];
+var presidentialYearsElected = [1932, 1952, 1960, 1968, 1992, 2008];
 
 var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
+var multiplicationLevelSound;
+var presidentialLevelSound;
+var gameOverSound;
 
 // Dunking
 var dunkGForce = 1.5;  // To eliminate dunking, set this value to 4
@@ -111,6 +114,7 @@ var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a 
 
 // Secret Presidential Easter Egg
 var isSecretOn = false;
+var secretWaiting = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
 
@@ -309,7 +313,7 @@ function initBaseBoard(){
 function animationLoop()
 {
 	if (gameIsOver) {
-		alert("Please restart the game.\nYou have found 1/4 of the bugs in our game ;P");
+		alert("Please restart the game.\nYou have found 1/4 of the bugs in our game :P");
 		return;
 	}
 	
@@ -348,7 +352,6 @@ function animationLoop()
 		
 		//set the current x,y co-ordinates of the object
 		setObjectXY(ball);
-		
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
 }
@@ -362,34 +365,30 @@ function checkAnswer(X,Y,answer,ball){
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
-		
 		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
 			bullseyeAnswer(answer);
 			adjustAndGoToNextProblem('bullseye');
 		}
-		else{
+		else {
 			displayAnswerBoardClose(answerY);
 			closeEnoughAnswer(answer);
 			adjustAndGoToNextProblem('closeEnough');
 		}
-		
 		clearScreenBottom(olddenom);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
-		
-		//reset current try to 0
-		currentTry = 0;
 		
 		if (currentTry == 1) {
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
-		
+		//reset current try to 0
+		currentTry = 0;
 		numBeginnerProblemsLeft--;
 		
 	} else {
-		//increment the number of tries 
+		//increment the number of tries if not correct
 		currentTry++;
 		
 		if (currentTry > 0){
@@ -398,9 +397,10 @@ function checkAnswer(X,Y,answer,ball){
 		}
 		
 		streakCounter = 0;
-		adjustProblemProbabilities('wrong');
+			
+		if(currentLevelType == 'fraction'){adjustProblemProbabilities('wrong');}
 		
-		// The first numBeginnerProblems times the user has infinite tries
+		// The first numBeginnerProblems times we keep resetting the currentTry to 4, so the user has infinite tries
 		if (numBeginnerProblemsLeft > 0 && currentTry > 4) {
 			currentTry = 4;
 		}
@@ -409,6 +409,7 @@ function checkAnswer(X,Y,answer,ball){
 		
 		//the current try is 
 		switch(currentTry){
+		  case 1: break; // do nothing
 		  case 2:
 				//show hint
 				if (currentLevelType == 'presidential') {
@@ -444,13 +445,9 @@ function checkAnswer(X,Y,answer,ball){
 				displayScoreBoard();
 				break;
 		  default:
+				alert("Turn "+currentTry+".Please restart the game.\nYou have found 1/5 of the bugs in our game :P");
 		}
 	}
-}
-
-// TODO: Move this to an appropriate location before checking in
-function showPresidentName() {
-	// TODO: implement
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -479,7 +476,7 @@ function computeBaseboardAnswer(problemId,bMin,bMax){
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	//everything is now offset by 10 pixels
-	answerY    = problemId * (phoneWidth / (bMax - bMin)) + bboffset;
+	answerY    = (problemId - bMin) * (phoneWidth / (bMax - bMin)) + bboffset;
 
 }
 
@@ -515,7 +512,6 @@ function addScaffolding(){
 		isScaffolded = true;
 	}	
 }
-
 
 function addBall()
 {
@@ -628,8 +624,13 @@ function clearScreenBottom(olddenom) {
 	//clear any existing hints
 	clearArrowHint();
 	clearUpArrowHint();
-	//clear the number line hints
+	clearPresidentName();
+	
 	clearDenominatorHint(olddenom);
+}
+
+function clearPresidentName() {
+	$("#baseboard-message").text("");
 }
 
 function clearArrowHint(){
@@ -662,6 +663,11 @@ function showDenominatorHint(answer){
 	
 	//if already present then return
 	if (isScaffolded){
+		return;
+	}
+	
+	if (denom == 0) {
+		//alert("denom 0 2");
 		return;
 	}
 	
@@ -735,6 +741,11 @@ function showDenominatorHint(answer){
  * TODO: if we put all hints into the same class, would it erase all of them with a single "remove()"?
  */
 function clearDenominatorHint(denom){
+	if (denom == 0) {
+		//alert("denom 0 1");
+		return;
+	}
+	
 	var i = 1;
 	while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
@@ -804,6 +815,7 @@ function clearAnswerBoard(answerY){
 function gameOver(){
 	clearInterval(timerLoop);
 	
+	playSoundIfSoundIsOn(gameOverSound);
 	$("#game-over").css("visibility", "visible");
 	$("#game-over").fadeIn("slow");
 	
@@ -812,14 +824,14 @@ function gameOver(){
 
 function goHome() {
 	clearScreenBottom(currentProblem.denominator);
-	$("#game-over").fadeOut('fast');
+	$("#game-over").css("visibility", "hidden");
 	setTimeout("jQT.goTo('#home', 'cube');", 100);
 }
 
 var firstTimeGame = true;
 function restartGame() {
 	
-	$("#game-over").fadeOut('fast');
+	$("#game-over").css("visibility", "hidden");
 	
 	// Initialize problem arrays
 	createFractionProblem2DArray();
@@ -855,7 +867,7 @@ function restartLevel(level) {
 	// level is undefined when the UI calls this function
 	if (level == undefined) {
 		level = currentLevel;
-		$("#game-over").fadeOut('fast');
+		$("#game-over").css("visibility", "hidden");
 	}
 	
 	setScore(0);
@@ -986,7 +998,9 @@ function ProblemObject(numer, denom)
 	this.problemType = 'fraction'; // default is fraction, other types could be fractionAddition, percent, integer, etc
 	this.numerator = numer;
 	this.denominator = denom;
-	this.decimalEquivalent = (numer / denom);   // this is the "answer" for this problem, it's decimalEquivalent;
+	
+	// this is the "answer" for this problem, it's decimalEquivalent;
+	this.decimalEquivalent = (denom == 0) ? 0 : (numer / denom);
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
 	this.problemLabel = ""; // a placeholder for Presidential names and other labels. 
 }
@@ -1016,8 +1030,12 @@ function initializeGameSounds()
 	bullseyeSounds[10] = new Media("www/sounds/sublime.wav");
 	bullseyeSounds[11] = new Media("www/sounds/flawless.wav");
 	
-	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
+	
+	presidentialLevelSound = new Media("www/sounds/hailtothechief.wav");
+	multiplicationLevelSound = new Media("www/sounds/mollusk.wav");
+	
+	gameOverSound = new Media("www/sounds/gameoversound.wav");
 }
 
 //
@@ -1050,7 +1068,9 @@ function closeEnoughAnswer()
 }
 
 function adjustAndGoToNextProblem(accuracy) {
-	adjustProblemProbabilities(accuracy);
+	if (currentLevelType == 'fraction') {
+		adjustProblemProbabilities(accuracy);
+	}
 	nextProblem();
 }
 
@@ -1148,8 +1168,20 @@ function bonusGraphic()
 
 // Controls the sequences of levels
 function nextLevel() {
+	var newLevel = currentLevel + 1;
+	
+	if (secretWaiting) {
+		newLevel = (currentLevelType == 'multiplication') ? 20 : 9;
+		secretWaiting = false;
+	}
+	
+	// if the level is greater than 20 or between 9 and 20, then do not change levels
+	if (newLevel > 20 || (20 > newLevel && newLevel > 9)) {
+		return;
+	}
+	
 	changeGravity(INIT_GRAVITY);	// Reset the gravity after each level
-	setLevel(currentLevel + 1);
+	setLevel(newLevel);
 	playNextLevelSound();
 }
 
@@ -1161,35 +1193,39 @@ function setLevel(level)
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
 	
-	if(currentLevel == 9)
-	{	// TODO: put everything related to multiplication here
+	if (currentLevel == 1) 
+	{
+		$("#baseMax").css("margin-left", "303px");
+		$("#multiplication-problem").text("");
+		changeLevelType('fraction');
+		baseboardMax = 1;
+		setBaseboardLimits(0);
+	}
+	else if (currentLevel == 5)
+	{
+		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
+		setBaseboardLimits(1);
+	}
+	else if (currentLevel == 9)
+	{
 		$("#numerator").text("");
 		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "265px");
 		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits(2);
-	} 
-	else if(currentLevel == 5)
-	{
-		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
-		setBaseboardLimits(1);
 	}
-	else if (currentLevel == 1) 
+	else if (currentLevel == 20)  // presidential
 	{
-		baseboardMax = 1;
-		setBaseboardLimits(0);
-	}
-	else if(currentLevel == 20)  // presidential
-	{
-		$("#numerator").text("");
-		$("#denominator").text("");
+		// moves message div up to above the White House
+		$("#game-messageboard").css("top","80px");
+		
 		$("#baseMax").css("margin-left", "275px");
 		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
 		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
 		baseboardMax = 2010;
-		baseboardMin = 1900;
+		baseboardMin = 1910;
 		setBaseboardLimits(3);
 	}
 
@@ -1197,9 +1233,11 @@ function setLevel(level)
 	setLevelBackgroundImage(currentLevel);
 	
 	var gameMessageTime = 3000; 
-	
-	if((currentLevel != 1) && (currentLevel < 20)){
-		// Changes Game Message, except for first level
+	if(currentLevel == 20){gameMessageTime = 7000;}  // more time for Prez level
+	if(currentLevel == 5 || currentLevel == 9){gameMessageTime = 5000;}  // more time for levels with new paradigms
+
+	// Changes Game Message, except for first level
+	if(currentLevel != 1){
 		var messageImageName = "messagelevel" + currentLevel;
 		changeGameMessage(messageImageName);
 		// Then erases it after 3 seconds, 7 if in President's mode
@@ -1220,17 +1258,18 @@ function changeLevelType(levelType)
 			$(".ballClass").css("background-image", newBg);
 			break;
 		case 'presidential':
-			var newBg = "url('images/Obama.png')";
-			$(".ballClass").css("background-image", newBg);
-			$("#multiplication-problem").fadeOut('fast'); // clears the multiplication prob off Obama's face
+			$("#multiplication-problem").text(""); // clears the multiplication prob off Obama's face
 			break;
 		case 'sqroot':
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
-		// TODO: should default be fraction?  Otherwise, this will remain when users reset the game
+		case 'fraction':
+			
 	}
 }
+
+// currentProblem.problemLabel.replace(' ', '_') + ".png"
 
 
 //
@@ -1272,16 +1311,26 @@ function createMultiplicationProblem2DArray()
 		
 		for(var secondNum = 0; secondNum <= highestMultiplier; secondNum++){
 			
-			multiplicationProblems[firstNum][secondNum] = new ProblemObject();
-			multiplicationProblems[firstNum][secondNum].problemType = 'multiplication'; 
-			multiplicationProblems[firstNum][secondNum].numerator = firstNum; 
 			// Note that this is a hacky misnomer. We are storing the first number of the multiplication problem as the "numerator". Sorry, God. 
-			multiplicationProblems[firstNum][secondNum].denominator = secondNum; 
+			multiplicationProblems[firstNum][secondNum] = new ProblemObject(firstNum, secondNum);
+			multiplicationProblems[firstNum][secondNum].problemType = 'multiplication'; 
 			multiplicationProblems[firstNum][secondNum].decimalEquivalent = firstNum * secondNum;
 			multiplicationProblems[firstNum][secondNum].probability = .5;
 		}
 	}
 }
+
+function createPresidentialProblemArray()
+{
+	for(i = 0; i < presidentialNames.length; i++){
+		
+		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
+		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
+		presidentialProblems[i].problemLabel = presidentialNames[i];
+		presidentialProblems[i].problemType = 'presidential';   
+	} 
+}
+
 
 // Adjusts the problem and related problem probabilties based on accuracy 
 // and creates and displays a new problem  
@@ -1294,9 +1343,9 @@ function nextProblem()
 	{
 		increaseScore(50);
 		bonusGraphic();
-		nextLevel();		
+		nextLevel();
 	} 
-	else if(++problemsFinishedThisLevel >= numProblemsPerLevel)
+	else if(++problemsFinishedThisLevel >= numProblemsPerLevel || secretWaiting)
 	{
 		nextLevel();
 	}
@@ -1366,6 +1415,13 @@ function getNewProblem()
 			currentProblem = multiplicationProblems[firstNum][secondNum];
 			break;
 		case 'presidential':
+			var nextPrez;
+			do {
+				nextPrez = presidentialProblems[getRandomInteger(0, presidentialProblems.length - 1)];
+			} while (nextPrez == currentProblem);
+			currentProblem = nextPrez;
+			var newBg = "url('images/"+currentProblem.problemLabel+".png')";
+			$(".ballClass").css("background-image", newBg);
 			break;
 	} 
 }
@@ -1389,26 +1445,6 @@ function displayCurrentProblem()
 	}
 }
 
-
-//
-//  Presidential Mode
-// 
-//
-
-
-function createPresidentialProblemArray()
-{
-	 for(i = 0; i < presidentialNames.length; i++){
-		 
-		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
-		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
-		presidentialProblems[i].problemLabel = presidentialNames[i];
-		presidentialProblems[i].problemType = 'presidential';   
-	} 
-}
-
-
-
 //
 // Helper functions
 //
@@ -1429,15 +1465,16 @@ function getRandomInteger(min,max)
  * The alert below should appear.
  */
 function secretClick() {
-	if (isSecretOn && (currentLevelType == 'multiplication')) {
-		//setLevel(20);
-		restartLevel(20);
-		nextProblem();
-	}
-	else if (isSecretOn) {
-		//setLevel(9);
-		restartLevel(9);
-		nextProblem();
+
+	if (gameIsOver) {
+		return;
+	} else if (isSecretOn) {
+		if (currentLevelType == 'multiplication') {
+			playSoundIfSoundIsOn(presidentialLevelSound);
+		} else {
+			playSoundIfSoundIsOn(multiplicationLevelSound);
+		}
+		secretWaiting = true;
 	}
 }
 
