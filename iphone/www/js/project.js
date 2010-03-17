@@ -1166,7 +1166,7 @@ function bonusGraphic()
 }
 
 // Controls the sequences of levels
-function nextLevel() {	// TODO: nextLevel()
+function nextLevel() {
 	var newLevel = currentLevel + 1;
 	
 	if (secretWaiting) {
@@ -1194,6 +1194,9 @@ function setLevel(level)
 	
 	if (currentLevel == 1) 
 	{
+		$("#baseMax").css("margin-left", "303px");
+		$("#multiplication-problem").text("");
+		changeLevelType('fraction');
 		baseboardMax = 1;
 		setBaseboardLimits(0);
 	}
@@ -1203,7 +1206,7 @@ function setLevel(level)
 		setBaseboardLimits(1);
 	}
 	else if (currentLevel == 9)
-	{	// TODO: put everything related to multiplication here
+	{
 		$("#numerator").text("");
 		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "265px");
@@ -1216,8 +1219,6 @@ function setLevel(level)
 		// moves message div up to above the White House
 		$("#game-messageboard").css("top","80px");
 		
-		$("#numerator").text("");
-		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "275px");
 		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
 		$("#baseMin").css("font-size", "15pt");
@@ -1256,13 +1257,14 @@ function changeLevelType(levelType)
 			$(".ballClass").css("background-image", newBg);
 			break;
 		case 'presidential':
-			$("#multiplication-problem").fadeOut('fast'); // clears the multiplication prob off Obama's face
+			$("#multiplication-problem").text(""); // clears the multiplication prob off Obama's face
 			break;
 		case 'sqroot':
 			var newBg = "url('images/sqrootball.png')";
 			$(".ballClass").css("background-image", newBg);
 			break;
-		
+		case 'fraction':
+			
 	}
 }
 
