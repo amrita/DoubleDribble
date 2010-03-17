@@ -50,6 +50,18 @@
   background-image: url('../images/aboutscreen.png');
 }
 
+#contactus{
+  margin-top:  0px;
+	margin-left: 100px;
+	
+	font-family: Helvetica;
+	font-size: 20pt;
+	font-weight: bold;
+	text-align: center;
+	color: white;
+	
+	position: absolute;
+}
 
 #full-screen-area
 {
@@ -332,3 +344,4 @@
 	width: 229px;
 	height: 42px;
 }
+
