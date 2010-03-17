@@ -1130,8 +1130,15 @@ function bonusGraphic()
 
 // Controls the sequences of levels
 function nextLevel() {
+	var newLevel = currentLevel + 1;
+	
+	// if the level is greater than 20 or between 9 and 20, then do not change levels
+	if (newLevel > 20 || (20 > newLevel && newLevel > 9)) {
+		return;
+	}
+	
 	changeGravity(INIT_GRAVITY);	// Reset the gravity after each level
-	setLevel(currentLevel + 1);
+	setLevel(newLevel);
 	playNextLevelSound();
 }
 
@@ -1143,7 +1150,17 @@ function setLevel(level)
 	streakCounter = 0;
 	problemsFinishedThisLevel = 0;
 	
-	if(currentLevel == 9)
+	if (currentLevel == 1) 
+	{
+		baseboardMax = 1;
+		setBaseboardLimits(0);
+	}
+	else if (currentLevel == 5)
+	{
+		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
+		setBaseboardLimits(1);
+	}
+	else if (currentLevel == 9)
 	{	// TODO: put everything related to multiplication here
 		$("#numerator").text("");
 		$("#denominator").text("");
@@ -1151,18 +1168,8 @@ function setLevel(level)
 		changeLevelType('multiplication');
 		baseboardMax = highestMultiplier * highestMultiplier;
 		setBaseboardLimits(2);
-	} 
-	else if(currentLevel == 5)
-	{
-		baseboardMax = 2;  // After 4th level, this sets the baseboardMax to 2, leading to improper fractions
-		setBaseboardLimits(1);
 	}
-	else if (currentLevel == 1) 
-	{
-		baseboardMax = 1;
-		setBaseboardLimits(0);
-	}
-	else if(currentLevel == 20)  // presidential
+	else if (currentLevel == 20)  // presidential
 	{
 		$("#numerator").text("");
 		$("#denominator").text("");
