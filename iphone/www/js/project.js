@@ -823,7 +823,7 @@ function restartGame() {
 	// Initialize problem arrays
 	createFractionProblem2DArray();
 	createMultiplicationProblem2DArray();
-	//createPresidentialProblemArray();
+	createPresidentialProblemArray();
 	
 	if (firstTimeGame) {
 		firstTimeGame = false;
@@ -1190,7 +1190,6 @@ function setLevel(level)
 		baseboardMax = 2010;
 		baseboardMin = 1900;
 		setBaseboardLimits(3);
-		alert('past the ALERT!');
 	}
 
 	// Changes background to new level background
@@ -1199,7 +1198,6 @@ function setLevel(level)
 	var gameMessageTime = 3000; 
 	
 	if((currentLevel != 1) && (currentLevel < 20)){
-		//alert('called');
 		// Changes Game Message, except for first level
 		var messageImageName = "messagelevel" + currentLevel;
 		changeGameMessage(messageImageName);
@@ -1399,12 +1397,12 @@ function displayCurrentProblem()
 
 function createPresidentialProblemArray()
 {
-	for(i = 0; i < presidentialNames.length; i++){
+	/* for(i = 0; i < presidentialNames.length; i++){
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
 		presidentialProblems[i] = ProblemObject(presidentialYearsElected[i],1); 
 		presidentialProblems[i].problemLabel = presidentialNames[i];
 		presidentialProblems[i].problemType = 'presidential';
-	}
+	}  */
 }
 
 
