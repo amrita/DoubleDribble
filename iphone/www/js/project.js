@@ -1162,22 +1162,28 @@ function setLevel(level)
 		$("#numerator").text("");
 		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "265px");
+		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
+		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
 		baseboardMax = 2010;
 		baseboardMin = 1900;
 		setBaseboardLimits(3);
+		alert('past the ALERT!');
 	}
-	
+
 	// Changes background to new level background
 	setLevelBackgroundImage(currentLevel);
 	
-	if(currentLevel != 1){
+	var gameMessageTime = 3000; 
+	
+	if((currentLevel != 1) && (currentLevel < 20)){
+		alert('called');
 		// Changes Game Message, except for first level
 		var messageImageName = "messagelevel" + currentLevel;
 		changeGameMessage(messageImageName);
-		// Then erases it after 3 seconds
-		setTimeout('changeGameMessage("");', 3000)	
-	}
+		// Then erases it after 3 seconds, 7 if in President's mode
+		setTimeout('changeGameMessage("");', gameMessageTime)	
+	} 
 }
 
 // Changes currentLevelType and the background of the ball to reflect that level
@@ -1338,6 +1344,8 @@ function getNewProblem()
 			} while(randomFloat > multiplicationProblems[firstNum][secondNum].probability); 
 			currentProblem = multiplicationProblems[firstNum][secondNum];
 			break;
+		case 'presidential':
+			break;
 	} 
 }
 
@@ -1354,6 +1362,8 @@ function displayCurrentProblem()
 			$("#multiplication-problem").text(fractionString);
 			break;
 		case 'integer':
+			break;
+		case 'presidential':
 			break;
 	}
 }
@@ -1398,13 +1408,12 @@ function getRandomInteger(min,max)
  */
 function secretClick() {
 	if (isSecretOn && (currentLevelType == 'multiplication')) {
-		alert('prez!');
-		setLevel(20);
+		//setLevel(20);
 		restartLevel(20);
 		nextProblem();
 	}
 	else if (isSecretOn) {
-		setLevel(9);
+		//setLevel(9);
 		restartLevel(9);
 		nextProblem();
 	}
