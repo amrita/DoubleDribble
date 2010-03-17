@@ -92,7 +92,7 @@ var multiplicationProblems = new Array(); // Creating an Array to hold all the m
 var highestMultiplier = 10; // The highest number for multiplication problems
 
 var presidentialProblems = new Array(); // Creating an Array to hold presidentail problems
-var presidentialNames = ['Obama'];
+var presidentialNames = ["Obama"];
 var presidentialYearsElected = [2008];
 
 var wrongAnswerSounds = new Array();
@@ -424,8 +424,8 @@ function checkAnswer(X,Y,answer,ball){
 				if (currentLevelType == 'multiplication') {
 					showArrowHint(X,Y,answer);
 				} else if (currentLevelType == 'presidential') {
-					showArrowHint(X,Y,answer);
 					showPresidentName();
+					showArrowHint(X,Y,answer);
 				} else {
 					showDenominatorHint(answer);
 				}
@@ -445,6 +445,11 @@ function checkAnswer(X,Y,answer,ball){
 		  default:
 		}
 	}
+}
+
+// TODO: Move this to an appropriate location before checking in
+function showPresidentName() {
+	// TODO: implement
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -572,7 +577,7 @@ function changeGameMessage(imageName)
 /********* SHOW HINTS/SCAFFOLDING CODE **********/
 
 function showPresidentName() {
-	// TODO: implement
+	$("#baseboard-message").text(currentProblem.problemLabel);
 }
 
 // show either the left or the right hint arrow based on the position

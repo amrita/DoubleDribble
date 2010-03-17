@@ -94,6 +94,13 @@
    /*visibility: hidden;*/
 }
 
+#baseboard-message {
+	position: absolute;
+	top: 435px;
+	width: 320px;
+	height: 20px;
+}
+
 .dHint
 {
   height: 30px;
