@@ -99,6 +99,7 @@ var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
+var secretLevelSound;
 
 // Dunking
 var dunkGForce = 1.5;  // To eliminate dunking, set this value to 4
@@ -111,6 +112,7 @@ var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a 
 
 // Secret Presidential Easter Egg
 var isSecretOn = false;
+var secretWaiting = false;
 var secretThreshold = 0.9;
 var secretVal = 0.0;
 
@@ -309,7 +311,7 @@ function initBaseBoard(){
 function animationLoop()
 {
 	if (gameIsOver) {
-		alert("Please restart the game.\nYou have found 1/4 of the bugs in our game ;P");
+		alert("Please restart the game.\nYou have found 1/4 of the bugs in our game :P");
 		return;
 	}
 	
@@ -362,18 +364,16 @@ function checkAnswer(X,Y,answer,ball){
 		//save the denominator
 		var olddenom = currentProblem.denominator;
 		
-		
 		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
 			bullseyeAnswer(answer);
 			adjustAndGoToNextProblem('bullseye');
 		}
-		else{
+		else {
 			displayAnswerBoardClose(answerY);
 			closeEnoughAnswer(answer);
 			adjustAndGoToNextProblem('closeEnough');
 		}
-		
 		clearScreenBottom(olddenom);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
@@ -385,9 +385,7 @@ function checkAnswer(X,Y,answer,ball){
 			changeGravity(getAdjustedGravity() + GRAVITY_CHANGE);
 		}
 		
-		
 		numBeginnerProblemsLeft--;
-		
 	} else {
 		//increment the number of tries 
 		currentTry++;
@@ -1017,6 +1015,8 @@ function initializeGameSounds()
 	
 	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
+	
+	secretLevelSound = bullseyeSounds[10];
 }
 
 //
@@ -1146,8 +1146,13 @@ function bonusGraphic()
 }
 
 // Controls the sequences of levels
-function nextLevel() {
+function nextLevel() {	// TODO: nextLevel()
 	var newLevel = currentLevel + 1;
+	
+	if (secretWaiting) {
+		newLevel = (currentLevelType == 'multiplication') ? 20 : 9;
+		secretWaiting = false;
+	}
 	
 	// if the level is greater than 20 or between 9 and 20, then do not change levels
 	if (newLevel > 20 || (20 > newLevel && newLevel > 9)) {
@@ -1300,7 +1305,7 @@ function nextProblem()
 	{
 		increaseScore(50);
 		bonusGraphic();
-		nextLevel();		
+		nextLevel();
 	} 
 	else if(++problemsFinishedThisLevel >= numProblemsPerLevel)
 	{
@@ -1435,15 +1440,12 @@ function getRandomInteger(min,max)
  * The alert below should appear.
  */
 function secretClick() {
-	if (isSecretOn && (currentLevelType == 'multiplication')) {
-		//setLevel(20);
-		restartLevel(20);
-		nextProblem();
-	}
-	else if (isSecretOn) {
-		//setLevel(9);
-		restartLevel(9);
-		nextProblem();
+	
+	if (gameIsOver) {
+		return;
+	} else if (isSecretOn) {
+		playSoundIfSoundIsOn(secretLevelSound);
+		secretWaiting = true;
 	}
 }
 
