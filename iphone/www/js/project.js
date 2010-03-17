@@ -1183,7 +1183,7 @@ function setLevel(level)
 	{
 		$("#numerator").text("");
 		$("#denominator").text("");
-		$("#baseMax").css("margin-left", "265px");
+		$("#baseMax").css("margin-left", "275px");
 		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
 		$("#baseMin").css("font-size", "15pt");
 		changeLevelType('presidential');
@@ -1397,12 +1397,13 @@ function displayCurrentProblem()
 
 function createPresidentialProblemArray()
 {
-	/* for(i = 0; i < presidentialNames.length; i++){
+	 for(i = 0; i < presidentialNames.length; i++){
+		 
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
-		presidentialProblems[i] = ProblemObject(presidentialYearsElected[i],1); 
+		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
 		presidentialProblems[i].problemLabel = presidentialNames[i];
-		presidentialProblems[i].problemType = 'presidential';
-	}  */
+		presidentialProblems[i].problemType = 'presidential';   
+	} 
 }
 
 
