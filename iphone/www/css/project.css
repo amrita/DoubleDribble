@@ -319,3 +319,37 @@
 	/*border: 3px solid purple;*/
 }
 
+/* Z-index of #mask must lower than #boxes .window */  
+#mask {  
+  margin-top:  65px;
+	margin-left: 35px;
+  position:absolute;  
+  z-index:9000;  
+  background-color:#000;  
+  display:none;  
+}  
+    
+#boxes .window {  
+  margin-top:  65px;
+	margin-left: 35px;
+  position:absolute;  
+  width:440px;  
+  height:200px;  
+  display:none;  
+  z-index:9999;  
+  padding:20px;  
+}  
+  
+  
+/* Customize your modal window here, you can add background image too */  
+#boxes #dialog {  
+  width:375px;   
+  height:203px;  
+}  
+
+.scoretext{
+  font-family: Helvetica;
+	font-size: 20pt;
+	text-align: center;
+  color: white;
+}

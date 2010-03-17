@@ -441,6 +441,7 @@ function checkAnswer(X,Y,answer,ball){
 				clearArrowHint();
 				displayAnswerBoardGameOver(answerY);
 				gameOver();	
+				displayScoreBoard();
 				break;
 		  default:
 		}
@@ -1446,5 +1447,129 @@ function sendMail()
 	document.location.href = "mailto:doubledribblegame@gmail.com?subject=Contact Us &body="; 
 }
 
+/*HIGH SCORES FUNCTION */
+//add the current score to the scoreboard and then display it.
+function displayScoreBoard(){
+	
+	var MAXSCORES = 6;
+	
+	//alert("In display score board");
+	
+	//set up even handler for the mask
+	$("#mask").click(maskClicked);
+	$(".window .close").click(closeClicked);
+	
+	//localStorage.clear();
+	
+	//if the localStorage variables don't exist create them
+	if (!(localStorage.getItem("nscores"))){
+		alert("creating nscores");
+		localStorage.setItem("nscores", 0);
+	}
+	
+	var nscores   = localStorage.getItem("nscores");
+	
+	//get the top 5 scores 
+  if (nscores < MAXSCORES){
+		nscores++; //increment nscores
+		var itemstr = "scores" + nscores;
+    localStorage.setItem(itemstr, playerScore);
+		alert(localStorage.getItem(itemstr));
+	}
+  else{
+		//add to the 1st position, use as a place holder
+		var itemstr = "scores1";
+		localStorage.setItem(itemstr, playerScore);
+	}
+	
+	//sort items in descending order
+	//there is prolly a more efficient way to do this
+	//but this works for now
+	for (var i = nscores - 1; i >= 1;  i--) {
+		for (var j = 1; j <= i; j++) {
+	    var itemstr1 = "scores" + (j+1);
+		  var itemstr2 = "scores" + (j);
+			
+	 	  score1 = localStorage.getItem(itemstr1);
+		  score2 = localStorage.getItem(itemstr2);
+			
+		  //alert("score1 " + score1 + " score2 is" + score2);
+		  //if the score is greater then insert it into the right place. 
+		  if (score1 < score2){
+				//alert("swapping");
+		    localStorage.setItem(itemstr1,score2);
+			  localStorage.setItem(itemstr2,score1);
+		  }
+	  }//for ends 
+	}//for ends
+
+	//alert("nscores is " + nscores);
+	
+	//display only the top 5 scores
+	/*
+	for (i = nscores; i > 1; i--){
+		var itemstr = "scores" + i;
+    alert("in for loop " + i + " " + localStorage.getItem(itemstr));
+	}
+  */
+	
+	localStorage.setItem("nscores", nscores);
+	
+	displayModalWindow();
+	
+}
 
 
+/*MODAL WINDOW CODE */
+//select all the a tag with name equal to modal  
+//display the modal window
+function displayModalWindow(){
+  //Cancel the link behavior  
+	//e.preventDefault();  
+												 
+	//Get the A tag  
+	//var id = $(this).attr('href');  
+	
+	//alert("trying to display modal window");
+	
+	var id = $("#boxes");
+												 
+	//Get the screen height and width  
+	var maskHeight = 300;  
+	var maskWidth  = 250;  
+												 
+	//Set height and width to mask to fill up the whole screen  
+	$('#mask').css({'width':maskWidth,'height':maskHeight});  
+												 
+	//transition effect       
+	$('#mask').fadeIn(1000);      
+	$('#mask').fadeTo("slow",0.8);    
+										
+												 
+	//transition effect  
+	$(id).fadeIn(2000);   
+	
+	//add score to the window
+	$('#mask').append('<div id="highscores" class="scoretext">High Scores</div><br/><br/>');
+	
+	//scores
+	$('#mask').append('<div id="scores6" class="scoretext">' + localStorage.getItem("scores6") +'</div>');
+	$('#mask').append('<div id="scores5" class="scoretext">' + localStorage.getItem("scores5") +'</div>');
+	$('#mask').append('<div id="scores4" class="scoretext">' + localStorage.getItem("scores4") +'</div>');
+	$('#mask').append('<div id="scores3" class="scoretext">' + localStorage.getItem("scores3") +'</div>');
+	$('#mask').append('<div id="scores2" class="scoretext">' + localStorage.getItem("scores2") +'</div>');
+												 
+};  
+
+//if close button is clicked 
+function closeClicked(event){
+ //Cancel the link behavior  
+ e.preventDefault();  
+ $('#mask, .window').hide();  
+};       
+
+//if mask is clicked  
+function maskClicked(event){
+  $(this).hide();  
+	$('.window').hide();  
+};           
