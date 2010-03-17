@@ -1439,6 +1439,11 @@ function secretClick() {
 	}
 }
 
+/* EMAIL FUNCTION */
+function sendMail()
+{ 
+	document.location.href = "mailto:doubledribblegame@gmail.com?subject=Contact Us &body="; 
+}
 
 
 
