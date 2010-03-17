@@ -350,7 +350,6 @@ function animationLoop()
 		
 		//set the current x,y co-ordinates of the object
 		setObjectXY(ball);
-		
 		checkAnswer(ballX,ballY,answerY,ball);
 	} 	
 }
@@ -472,6 +471,7 @@ function setObjectXY(obj){
 //exact correct answer to the problem 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
 function computeBaseboardAnswer(problemId,bMin,bMax){
+	//alert("computeBaseboardAnswer: "+problemId);
 	var phoneWidth = 320 - 2*bboffset;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
@@ -512,7 +512,6 @@ function addScaffolding(){
 		isScaffolded = true;
 	}	
 }
-
 
 function addBall()
 {
@@ -625,7 +624,7 @@ function clearScreenBottom(olddenom) {
 	//clear any existing hints
 	clearArrowHint();
 	clearUpArrowHint();
-	//clear the number line hints
+	
 	clearDenominatorHint(olddenom);
 }
 
@@ -659,6 +658,11 @@ function showDenominatorHint(answer){
 	
 	//if already present then return
 	if (isScaffolded){
+		return;
+	}
+	
+	if (denom == 0) {
+		//alert("denom 0 2");
 		return;
 	}
 	
@@ -732,6 +736,11 @@ function showDenominatorHint(answer){
  * TODO: if we put all hints into the same class, would it erase all of them with a single "remove()"?
  */
 function clearDenominatorHint(denom){
+	if (denom == 0) {
+		//alert("denom 0 1");
+		return;
+	}
+	
 	var i = 1;
 	while ( (i / denom) < baseboardMax){
 		$('#hint-' + i).remove();
@@ -983,7 +992,9 @@ function ProblemObject(numer, denom)
 	this.problemType = 'fraction'; // default is fraction, other types could be fractionAddition, percent, integer, etc
 	this.numerator = numer;
 	this.denominator = denom;
-	this.decimalEquivalent = (numer / denom);   // this is the "answer" for this problem, it's decimalEquivalent;
+	
+	// this is the "answer" for this problem, it's decimalEquivalent;
+	this.decimalEquivalent = (denom == 0) ? 0 : (numer / denom);
 	this.probability = .5;  // this is the probability (between 0-1) that this problem will be put on the screen once it is selected
 	this.problemLabel = ""; // a placeholder for Presidential names and other labels. 
 }
@@ -1048,7 +1059,9 @@ function closeEnoughAnswer()
 }
 
 function adjustAndGoToNextProblem(accuracy) {
-	adjustProblemProbabilities(accuracy);
+	if (currentLevelType == 'fraction') {
+		adjustProblemProbabilities(accuracy);
+	}
 	nextProblem();
 }
 
@@ -1289,11 +1302,9 @@ function createMultiplicationProblem2DArray()
 		
 		for(var secondNum = 0; secondNum <= highestMultiplier; secondNum++){
 			
-			multiplicationProblems[firstNum][secondNum] = new ProblemObject();
-			multiplicationProblems[firstNum][secondNum].problemType = 'multiplication'; 
-			multiplicationProblems[firstNum][secondNum].numerator = firstNum; 
 			// Note that this is a hacky misnomer. We are storing the first number of the multiplication problem as the "numerator". Sorry, God. 
-			multiplicationProblems[firstNum][secondNum].denominator = secondNum; 
+			multiplicationProblems[firstNum][secondNum] = new ProblemObject(firstNum, secondNum);
+			multiplicationProblems[firstNum][secondNum].problemType = 'multiplication'; 
 			multiplicationProblems[firstNum][secondNum].decimalEquivalent = firstNum * secondNum;
 			multiplicationProblems[firstNum][secondNum].probability = .5;
 		}
@@ -1313,7 +1324,7 @@ function nextProblem()
 		bonusGraphic();
 		nextLevel();
 	} 
-	else if(++problemsFinishedThisLevel >= numProblemsPerLevel)
+	else if(++problemsFinishedThisLevel >= numProblemsPerLevel || secretWaiting)
 	{
 		nextLevel();
 	}
