@@ -65,7 +65,7 @@ var vibrateTime = 600;
 var gameIsOver = true;
 
 // whether or not the player is playing the first problem in the game
-var numBeginnerProblems = 0;
+var numBeginnerProblems = 5;
 var numBeginnerProblemsLeft = numBeginnerProblems;
 
 var currentLevel = 1;    // Tracks the player's current level
