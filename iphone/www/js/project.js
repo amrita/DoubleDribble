@@ -99,7 +99,8 @@ var wrongAnswerSounds = new Array();
 var closeEnoughSounds = new Array();
 var bullseyeSounds = new Array();
 var nextLevelSounds = new Array();
-var secretLevelSound;
+var multiplicationLevelSound;
+var presidentialLevelSound;
 
 // Dunking
 var dunkGForce = 1.5;  // To eliminate dunking, set this value to 4
@@ -407,6 +408,7 @@ function checkAnswer(X,Y,answer,ball){
 		
 		//the current try is 
 		switch(currentTry){
+		  case 1: break; // do nothing
 		  case 2:
 				//show hint
 				if (currentLevelType == 'presidential') {
@@ -441,14 +443,9 @@ function checkAnswer(X,Y,answer,ball){
 				gameOver();	
 				break;
 		  default:
-				alert("Please restart the game.\nYou have found 1/5 of the bugs in our game :P");
+				alert("Turn "+currentTry+".Please restart the game.\nYou have found 1/5 of the bugs in our game :P");
 		}
 	}
-}
-
-// TODO: Move this to an appropriate location before checking in
-function showPresidentName() {
-	$("#baseboard-message").text(currentProblem.problemLabel);
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -625,8 +622,13 @@ function clearScreenBottom(olddenom) {
 	//clear any existing hints
 	clearArrowHint();
 	clearUpArrowHint();
+	clearPresidentName();
 	
 	clearDenominatorHint(olddenom);
+}
+
+function clearPresidentName() {
+	$("#baseboard-message").text("");
 }
 
 function clearArrowHint(){
@@ -1027,7 +1029,8 @@ function initializeGameSounds()
 	
 	nextLevelSounds[0] = new Media("www/sounds/cheer.wav");
 	
-	secretLevelSound = new Media("www/sounds/hailtothechief.wav");
+	presidentialLevelSound = new Media("www/sounds/hailtothechief.wav");
+	multiplicationLevelSound = new Media("www/sounds/mollusk.wav");
 }
 
 //
@@ -1249,8 +1252,6 @@ function changeLevelType(levelType)
 			$(".ballClass").css("background-image", newBg);
 			break;
 		case 'presidential':
-			var newBg = "url('images/Obama.png')";
-			$(".ballClass").css("background-image", newBg);
 			$("#multiplication-problem").fadeOut('fast'); // clears the multiplication prob off Obama's face
 			break;
 		case 'sqroot':
@@ -1311,6 +1312,18 @@ function createMultiplicationProblem2DArray()
 		}
 	}
 }
+
+function createPresidentialProblemArray()
+{
+	for(i = 0; i < presidentialNames.length; i++){
+		
+		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
+		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
+		presidentialProblems[i].problemLabel = presidentialNames[i];
+		presidentialProblems[i].problemType = 'presidential';   
+	} 
+}
+
 
 // Adjusts the problem and related problem probabilties based on accuracy 
 // and creates and displays a new problem  
@@ -1395,7 +1408,13 @@ function getNewProblem()
 			currentProblem = multiplicationProblems[firstNum][secondNum];
 			break;
 		case 'presidential':
-			currentProblem = presidentialProblems[0];
+			var nextPrez;
+			do {
+				nextPrez = presidentialProblems[getRandomInteger(0, presidentialProblems.length - 1)];
+			} while (nextPrez == currentProblem);
+			currentProblem = nextPrez;
+			var newBg = "url('images/"+currentProblem.problemLabel+".png')";
+			$(".ballClass").css("background-image", newBg);
 			break;
 	} 
 }
@@ -1418,26 +1437,6 @@ function displayCurrentProblem()
 			break;
 	}
 }
-
-
-//
-//  Presidential Mode
-// 
-//
-
-
-function createPresidentialProblemArray()
-{
-	 for(i = 0; i < presidentialNames.length; i++){
-		 
-		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
-		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
-		presidentialProblems[i].problemLabel = presidentialNames[i];
-		presidentialProblems[i].problemType = 'presidential';   
-	} 
-}
-
-
 
 //
 // Helper functions
@@ -1463,7 +1462,11 @@ function secretClick() {
 	if (gameIsOver) {
 		return;
 	} else if (isSecretOn) {
-		playSoundIfSoundIsOn(secretLevelSound);
+		if (currentLevelType == 'multiplication') {
+			playSoundIfSoundIsOn(presidentialLevelSound);
+		} else {
+			playSoundIfSoundIsOn(multiplicationLevelSound);
+		}
 		secretWaiting = true;
 	}
 }
