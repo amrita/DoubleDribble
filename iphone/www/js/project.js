@@ -446,7 +446,7 @@ function checkAnswer(X,Y,answer,ball){
 
 // TODO: Move this to an appropriate location before checking in
 function showPresidentName() {
-	// TODO: implement
+	$("#baseboard-message").text(currentProblem.problemLabel);
 }
 
 //set the current x,y co-ordinates of the ball 
@@ -471,12 +471,11 @@ function setObjectXY(obj){
 //exact correct answer to the problem 
 //does types 0 - 1, 0 - 2, 0 - 100, 1 - 2 and so on .. 
 function computeBaseboardAnswer(problemId,bMin,bMax){
-	//alert("computeBaseboardAnswer: "+problemId);
 	var phoneWidth = 320 - 2*bboffset;
 	
 	// compute the Y co-ordinate on the baseboard where the correct answer should be 
 	//everything is now offset by 10 pixels
-	answerY    = problemId * (phoneWidth / (bMax - bMin)) + bboffset;
+	answerY    = (problemId - bMin) * (phoneWidth / (bMax - bMin)) + bboffset;
 
 }
 
@@ -1392,6 +1391,7 @@ function getNewProblem()
 			currentProblem = multiplicationProblems[firstNum][secondNum];
 			break;
 		case 'presidential':
+			currentProblem = presidentialProblems[0];
 			break;
 	} 
 }
