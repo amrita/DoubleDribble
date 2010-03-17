@@ -289,20 +289,46 @@
 }
 
 #game-over {
-	position: absolute;
+/*	position: absolute;
 	top: 100px;
 	left: 90px;
 	width: 140px;
 	height: 120px;
 	border: 3px solid red;
-	background: #0DBEFF;
+	background: #0DBEFF;*/
 	
-	visibility: hidden;
+   visibility: hidden; 
 }
 
-#game-over-buttons {
+#game-over-graphic {
+	background-image: url('../images/gameover.png');
+	width: 233px;
+	height: 74px;
 	position: absolute;
-	top: 35px;
-	left: 23px;
-	/*border: 3px solid purple;*/
+	top: 105px;
+	left: 20px;
+}
+
+#restart-level{
+	top:170px;
+	left:65px;
+	position: absolute;
+	width: 230px;
+	height: 38px;
+}
+
+#restart-game{
+	top:205px;
+	left: 62px;
+	position: absolute;
+	width: 246px;
+	height: 46px;
+}
+
+#go-home{
+	top: 250px;
+	left:66px;
+	position: absolute;
+	width: 229px;
+	height: 42px;
 }
