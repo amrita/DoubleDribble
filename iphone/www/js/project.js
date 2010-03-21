@@ -413,7 +413,7 @@ function checkAnswer(X,Y,answer,ball){
 		  case 2:
 				//show hint
 				if (currentLevelType == 'presidential') {
-					showPresidentName();
+					showPresidentName(false);
 				} else {
 					showArrowHint(X,Y,answer);
 				}
@@ -425,7 +425,7 @@ function checkAnswer(X,Y,answer,ball){
 				if (currentLevelType == 'multiplication') {
 					showArrowHint(X,Y,answer);
 				} else if (currentLevelType == 'presidential') {
-					showPresidentName();
+					showPresidentName(true);
 					showArrowHint(X,Y,answer);
 				} else {
 					showDenominatorHint(answer);
@@ -573,8 +573,9 @@ function changeGameMessage(imageName)
 
 /********* SHOW HINTS/SCAFFOLDING CODE **********/
 
-function showPresidentName() {
-	$("#baseboard-message").text(currentProblem.problemLabel);
+function showPresidentName(withYear) {
+	var nameHint = currentProblem.problemLabel + (withYear ? " - " + currentProblem.numerator : "");
+	$("#baseboard-message").text(nameHint);
 }
 
 // show either the left or the right hint arrow based on the position
