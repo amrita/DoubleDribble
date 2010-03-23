@@ -377,7 +377,7 @@ function checkAnswer(X,Y,answer,ball){
 			adjustAndGoToNextProblem('closeEnough');
 		}
 		clearScreenBottom(olddenom);
-		potentiallyDisplayMultiplicationMessage(lastProblem);
+		potentiallyDisplayMultiplicationMessage(lastProblem, 2000);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
@@ -443,7 +443,7 @@ function checkAnswer(X,Y,answer,ball){
 				currentTry = 1;	
 				clearArrowHint();
 				displayAnswerBoardGameOver(answerY);
-				potentiallyDisplayMultiplicationMessage(currentProblem);
+				potentiallyDisplayMultiplicationMessage(currentProblem, 5000);
 				gameOver();	
 				displayScoreBoard();
 				break;
@@ -1622,11 +1622,11 @@ function maskClicked(event){
 	$('.window').hide();  
 };           
 
-function potentiallyDisplayMultiplicationMessage(lastProblem) {
+function potentiallyDisplayMultiplicationMessage(lastProblem, appearanceTime) {
 	if (lastProblem.problemType == 'multiplication') {
 		var problemAndSolution = lastProblem.numerator + " x " + lastProblem.denominator
 		+ " = " + parseInt(lastProblem.decimalEquivalent);
 		$("#baseboard-message").text(problemAndSolution);
-		setTimeout("$('#baseboard-message').text('');", 2000);
+		setTimeout("$('#baseboard-message').text('');", appearanceTime);
 	}
 }
