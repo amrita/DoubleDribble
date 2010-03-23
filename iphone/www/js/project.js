@@ -364,6 +364,7 @@ function checkAnswer(X,Y,answer,ball){
 		
 		//save the denominator
 		var olddenom = currentProblem.denominator;
+		var lastProblem = currentProblem;
 		
 		if (Y > answer - error && Y < answer + error){
 			displayAnswerBoardDeadOn(answerY);
@@ -376,6 +377,7 @@ function checkAnswer(X,Y,answer,ball){
 			adjustAndGoToNextProblem('closeEnough');
 		}
 		clearScreenBottom(olddenom);
+		potentiallyDisplayMultiplicationMessage(lastProblem);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
@@ -441,6 +443,7 @@ function checkAnswer(X,Y,answer,ball){
 				currentTry = 1;	
 				clearArrowHint();
 				displayAnswerBoardGameOver(answerY);
+				potentiallyDisplayMultiplicationMessage(currentProblem);
 				gameOver();	
 				displayScoreBoard();
 				break;
@@ -1469,7 +1472,7 @@ function secretClick() {
 
 	if (gameIsOver) {
 		return;
-	} else if (isSecretOn) {
+	} else { //if (isSecretOn) {
 		if (currentLevelType == 'multiplication') {
 			playSoundIfSoundIsOn(presidentialLevelSound);
 		} else {
@@ -1618,3 +1621,12 @@ function maskClicked(event){
   $(this).hide();  
 	$('.window').hide();  
 };           
+
+function potentiallyDisplayMultiplicationMessage(lastProblem) {
+	if (lastProblem.problemType == 'multiplication') {
+		var problemAndSolution = lastProblem.numerator + " x " + lastProblem.denominator
+		+ " = " + parseInt(lastProblem.decimalEquivalent);
+		$("#baseboard-message").text(problemAndSolution);
+		setTimeout("$('#baseboard-message').text('');", 2000);
+	}
+}
