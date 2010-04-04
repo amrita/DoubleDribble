@@ -26,6 +26,19 @@
 	position: absolute;
 }
 
+
+#play-multiplication {
+	top:  320px;
+	left: 82px;
+	position: absolute;
+}
+
+#play-presidents {
+	top:  340px;
+	left: 82px;
+	position: absolute;
+}
+
 #howtoplaymenu{
     top:  385px;
 	left: 97px;

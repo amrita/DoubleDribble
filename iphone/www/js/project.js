@@ -160,8 +160,25 @@ function gameScreenHasAppeared(event, info)
 	//set level parameters
 	setBaseboardLimits(0);
 	
-	// Initialize the first problem
-	currentProblem = new ProblemObject(1, 2);
+	// Initialize the first problem  TODO: Ugh, this is a pretty nasty hack
+	//if (firstLevel == 1) {
+		currentProblem = new ProblemObject(1, 2);
+	
+	if (firstLevel > 1) {
+		secretWaiting = true;
+	}
+	/*} else if (firstLevel == 9) {
+		currentProblem = new ProblemObject(8, 3);
+		currentProblemproblemType = 'multiplication'; 
+		currentProblem.decimalEquivalent = currentProblem.numerator * currentProblem.denominator;
+		currentProblem.probability = .5;
+	} else if (firstLevel == 20) {
+		currentProblem = new ProblemObject(presidentialYearsElected[1],1); 
+		currentProblem.problemLabel = presidentialNames[1];
+		currentProblem.problemType = 'presidential';
+	} else {
+		alert("Unexpected first level: "+firstLevel);
+	}*/
 	
 	// Initialize Game sounds
 	initializeGameSounds();
@@ -377,7 +394,7 @@ function checkAnswer(X,Y,answer,ball){
 			adjustAndGoToNextProblem('closeEnough');
 		}
 		clearScreenBottom(olddenom);
-		potentiallyDisplayMultiplicationMessage(lastProblem, 2000);
+		potentiallyDisplayMessageAfterProblem(lastProblem, 2000);
 		
 		computeBaseboardAnswer(currentProblem.decimalEquivalent, baseboardMin, baseboardMax);
 		
@@ -415,7 +432,7 @@ function checkAnswer(X,Y,answer,ball){
 		  case 2:
 				//show hint
 				if (currentLevelType == 'presidential') {
-					showPresidentName(false);
+					showPresidentName(currentProblem, /*showYear=*/false);
 				} else {
 					showArrowHint(X,Y,answer);
 				}
@@ -427,7 +444,7 @@ function checkAnswer(X,Y,answer,ball){
 				if (currentLevelType == 'multiplication') {
 					showArrowHint(X,Y,answer);
 				} else if (currentLevelType == 'presidential') {
-					showPresidentName(true);
+					showPresidentName(currentProblem, /*showYear=*/false);
 					showArrowHint(X,Y,answer);
 				} else {
 					showDenominatorHint(answer);
@@ -443,7 +460,7 @@ function checkAnswer(X,Y,answer,ball){
 				currentTry = 1;	
 				clearArrowHint();
 				displayAnswerBoardGameOver(answerY);
-				potentiallyDisplayMultiplicationMessage(currentProblem, 5000);
+				potentiallyDisplayMessageAfterProblem(currentProblem, 5000);
 				gameOver();	
 				displayScoreBoard();
 				break;
@@ -576,8 +593,8 @@ function changeGameMessage(imageName)
 
 /********* SHOW HINTS/SCAFFOLDING CODE **********/
 
-function showPresidentName(withYear) {
-	var nameHint = currentProblem.problemLabel + (withYear ? " - " + currentProblem.numerator : "");
+function showPresidentName(problem, withYear) {
+	var nameHint = problem.problemLabel + (withYear ? " - " + problem.numerator : "");
 	$("#baseboard-message").text(nameHint);
 }
 
@@ -848,6 +865,7 @@ function restartGame() {
 		// Clean up previous game
 		clearScreenBottom(currentProblem.denominator);
 		
+		firstLevel = 1;
 		currentLevel = 1;
 		baseboardMax = 1;
 		baseboardMin = 0;
@@ -860,7 +878,12 @@ function restartGame() {
 	displayCurrentProblem();
 	addScaffolding();
 	
-	restartLevel(1);
+	restartLevel(firstLevel);
+}
+
+var firstLevel = 1;
+function setFirstLevel(levelNum) {
+	firstLevel = levelNum;
 }
 
 // This resets all values for a 'new' game.
@@ -1176,6 +1199,9 @@ function nextLevel() {
 	
 	if (secretWaiting) {
 		newLevel = (currentLevelType == 'multiplication') ? 20 : 9;
+		if (firstLevel > 1) {
+			newLevel = firstLevel;
+		}
 		secretWaiting = false;
 	}
 	
@@ -1331,7 +1357,7 @@ function createPresidentialProblemArray()
 		// makes the decimal equivalent to the year elected b/c decimal equiv is calculated as firstnum/secondnum
 		presidentialProblems[i] = new ProblemObject(presidentialYearsElected[i],1); 
 		presidentialProblems[i].problemLabel = presidentialNames[i];
-		presidentialProblems[i].problemType = 'presidential';   
+		presidentialProblems[i].problemType = 'presidential';
 	} 
 }
 
@@ -1622,11 +1648,16 @@ function maskClicked(event){
 	$('.window').hide();  
 };           
 
-function potentiallyDisplayMultiplicationMessage(lastProblem, appearanceTime) {
+function potentiallyDisplayMessageAfterProblem(lastProblem, appearanceTime) {
+	
 	if (lastProblem.problemType == 'multiplication') {
 		var problemAndSolution = lastProblem.numerator + " x " + lastProblem.denominator
 		+ " = " + parseInt(lastProblem.decimalEquivalent);
 		$("#baseboard-message").text(problemAndSolution);
+		setTimeout("$('#baseboard-message').text('');", appearanceTime);
+	}
+	else if (lastProblem.problemType == 'presidential') {
+		showPresidentName(lastProblem, /*showYear=*/true);
 		setTimeout("$('#baseboard-message').text('');", appearanceTime);
 	}
 }
