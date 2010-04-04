@@ -161,24 +161,13 @@ function gameScreenHasAppeared(event, info)
 	setBaseboardLimits(0);
 	
 	// Initialize the first problem  TODO: Ugh, this is a pretty nasty hack
-	//if (firstLevel == 1) {
-		currentProblem = new ProblemObject(1, 2);
+	currentProblem = new ProblemObject(1, 2);
 	
+	// This allows us to skip into the game at the given firstLevel
 	if (firstLevel > 1) {
 		secretWaiting = true;
+		showTextMessageAndDisappearLater("Next level: "+firstLevel, 3000);
 	}
-	/*} else if (firstLevel == 9) {
-		currentProblem = new ProblemObject(8, 3);
-		currentProblemproblemType = 'multiplication'; 
-		currentProblem.decimalEquivalent = currentProblem.numerator * currentProblem.denominator;
-		currentProblem.probability = .5;
-	} else if (firstLevel == 20) {
-		currentProblem = new ProblemObject(presidentialYearsElected[1],1); 
-		currentProblem.problemLabel = presidentialNames[1];
-		currentProblem.problemType = 'presidential';
-	} else {
-		alert("Unexpected first level: "+firstLevel);
-	}*/
 	
 	// Initialize Game sounds
 	initializeGameSounds();
@@ -865,7 +854,6 @@ function restartGame() {
 		// Clean up previous game
 		clearScreenBottom(currentProblem.denominator);
 		
-		firstLevel = 1;
 		currentLevel = 1;
 		baseboardMax = 1;
 		baseboardMin = 0;
@@ -878,7 +866,7 @@ function restartGame() {
 	displayCurrentProblem();
 	addScaffolding();
 	
-	restartLevel(firstLevel);
+	restartLevel(1);
 }
 
 var firstLevel = 1;
@@ -1201,6 +1189,7 @@ function nextLevel() {
 		newLevel = (currentLevelType == 'multiplication') ? 20 : 9;
 		if (firstLevel > 1) {
 			newLevel = firstLevel;
+			firstLevel = 1;
 		}
 		secretWaiting = false;
 	}
@@ -1250,6 +1239,8 @@ function setLevel(level)
 		// moves message div up to above the White House
 		$("#game-messageboard").css("top","80px");
 		
+		$("#numerator").text("");
+		$("#denominator").text("");
 		$("#baseMax").css("margin-left", "275px");
 		$("#baseMax").css("font-size", "15pt");  // Makes the Presidential years smaller
 		$("#baseMin").css("font-size", "15pt");
@@ -1653,11 +1644,15 @@ function potentiallyDisplayMessageAfterProblem(lastProblem, appearanceTime) {
 	if (lastProblem.problemType == 'multiplication') {
 		var problemAndSolution = lastProblem.numerator + " x " + lastProblem.denominator
 		+ " = " + parseInt(lastProblem.decimalEquivalent);
-		$("#baseboard-message").text(problemAndSolution);
-		setTimeout("$('#baseboard-message').text('');", appearanceTime);
+		showTextMessageAndDisappearLater(problemAndSolution);
 	}
 	else if (lastProblem.problemType == 'presidential') {
 		showPresidentName(lastProblem, /*showYear=*/true);
 		setTimeout("$('#baseboard-message').text('');", appearanceTime);
 	}
+}
+
+function showTextMessageAndDisappearLater(message, appearanceTime) {
+	$("#baseboard-message").text(message);
+	setTimeout("$('#baseboard-message').text('');", appearanceTime);
 }
