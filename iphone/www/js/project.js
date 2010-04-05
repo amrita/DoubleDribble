@@ -1644,7 +1644,7 @@ function potentiallyDisplayMessageAfterProblem(lastProblem, appearanceTime) {
 	if (lastProblem.problemType == 'multiplication') {
 		var problemAndSolution = lastProblem.numerator + " x " + lastProblem.denominator
 		+ " = " + parseInt(lastProblem.decimalEquivalent);
-		showTextMessageAndDisappearLater(problemAndSolution);
+		showTextMessageAndDisappearLater(problemAndSolution, appearanceTime);
 	}
 	else if (lastProblem.problemType == 'presidential') {
 		showPresidentName(lastProblem, /*showYear=*/true);
