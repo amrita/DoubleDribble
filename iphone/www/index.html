@@ -21,14 +21,13 @@
 <body>
 
 	<!-- Home screen -->
-	<div id="home">
-		<div id="playmenu" onclick="setFirstLevel(1); jQT.goTo('#game-screen')"><img src="images/playmenu.png" alt="Play"/></div>
-		<div id="preferencesmenu" onclick="jQT.goTo('#settings', 'cube')"><img src="images/preferencesmenu.png" alt="Preferences"/></div>
-	<!--	<div id="howtoplaymenu" onclick="jQT.goTo('#how-to-play', 'cube')"><img src="images/howtoplaymenu.png" alt="How to Play"/></div> -->
-		<div id="play-multiplication" onclick="setFirstLevel(9); jQT.goTo('#game-screen');">Play Multiplication</div>
-		<div id="play-presidents" onclick="setFirstLevel(20); jQT.goTo('#game-screen');">Play Presidents</div>
-		<div id="aboutmenu" onclick="jQT.goTo('#about', 'cube')"><img src="images/aboutmenu.png" alt="About"/></div>
-	</div>
+    <div id="home">
+        <div id="playmenu" onclick="jQT.goTo('#game-screen')"><img src="images/playmenu.png" alt="Play"/></div>
+        <div id="multiplicationmenu" onclick="setFirstLevel(9); jQT.goTo('#game-screen', 'cube');"><img src="images/multiplicationmenu.png" alt="Multiplication"/></div>
+        <div id="presidentsmenu" onclick="setFirstLevel(20); jQT.goTo('#game-screen', 'cube');"><img src="images/presidentsmenu.png" alt="Presidents"/></div>
+        <div id="preferencesmenu" onclick="jQT.goTo('#settings', 'cube')"><img src="images/preferencesmenu.png" alt="Preferences"/></div>
+        <div id="aboutmenu" onclick="jQT.goTo('#about', 'cube')"><img src="images/aboutmenu.png" alt="About"/></div>
+    </div>
 
 	<!-- Game screen -->
 	<div id="game-screen">

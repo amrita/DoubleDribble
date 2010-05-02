@@ -15,9 +15,9 @@
 }
 
 #playmenu{
-  top:  280px;
-	left: 80px;
-	position: absolute;
+    top:  291px;
+    left: 55px;
+    position: absolute;
 }
 
 #preferencesmenu{
@@ -27,28 +27,28 @@
 }
 
 
-#play-multiplication {
-	top:  320px;
-	left: 82px;
-	position: absolute;
+#multiplicationmenu{
+    top:  390px;
+    left: 0px;
+    position: absolute;
 }
 
-#play-presidents {
-	top:  340px;
-	left: 82px;
-	position: absolute;
+#presidentsmenu{
+    top:  390px;
+    left: 182px;
+    position: absolute;
 }
 
-#howtoplaymenu{
-    top:  385px;
-	left: 97px;
-	position: absolute;
+#preferencesmenu{
+    top:  435px;
+    left: 36px;
+    position: absolute;
 }
 
 #aboutmenu{
-  top:  410px;
-	left: 90px;
-	position: absolute;
+    top:  435px;
+    left: 185px;
+    position: absolute;
 }
 
 #settings{

@@ -110,7 +110,7 @@ var accelerometerFrequency = 60;
 var isDunking = false;
 var dunkWait = false;
 var preDunkGravity;
-var dunkGravityChange = 50.0; // Gravity will be multiplied by this amount on a dunk
+var dunkGravityChange = 23.0; // Gravity will be multiplied by this amount on a dunk
 
 // Secret Presidential Easter Egg
 var isSecretOn = false;
